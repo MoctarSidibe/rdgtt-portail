@@ -1,0 +1,100 @@
+# Simplified Traefik Dynamic Rules for R-DGTT Portail
+# Service routing configuration for simple deployment
+
+http:
+  routers:
+    # Frontend Router
+    frontend:
+      rule: "PathPrefix(`/`)"
+      service: frontend
+      priority: 1
+      middlewares:
+        - cors
+
+    # Usager Service Router
+    usager-service:
+      rule: "PathPrefix(`/api/usager`)"
+      service: usager-service
+      priority: 2
+      middlewares:
+        - cors
+
+    # Auto-École Service Router
+    auto-ecole-service:
+      rule: "PathPrefix(`/api/auto-ecole`)"
+      service: auto-ecole-service
+      priority: 2
+      middlewares:
+        - cors
+
+    # Permis Service Router
+    permis-service:
+      rule: "PathPrefix(`/api/permis`)"
+      service: permis-service
+      priority: 2
+      middlewares:
+        - cors
+
+    # Admin Service Router
+    admin-service:
+      rule: "PathPrefix(`/api/admin`)"
+      service: admin-service
+      priority: 2
+      middlewares:
+        - cors
+
+    # Traefik Dashboard Router
+    traefik-dashboard:
+      rule: "PathPrefix(`/traefik`)"
+      service: api@internal
+      priority: 3
+
+  services:
+    # Frontend Service
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:3000"
+
+    # Usager Service
+    usager-service:
+      loadBalancer:
+        servers:
+          - url: "http://usager-service:8081"
+
+    # Auto-École Service
+    auto-ecole-service:
+      loadBalancer:
+        servers:
+          - url: "http://auto-ecole-service:8082"
+
+    # Permis Service
+    permis-service:
+      loadBalancer:
+        servers:
+          - url: "http://permis-service:8083"
+
+    # Admin Service
+    admin-service:
+      loadBalancer:
+        servers:
+          - url: "http://admin-service:8085"
+
+  middlewares:
+    # CORS Middleware
+    cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "*"
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+          - "X-Requested-With"
+        accessControlMaxAge: 100
+        addVaryHeader: true

@@ -1,0 +1,75 @@
+# Traefik Configuration for R-DGTT Portail
+# Optimized for Hetzner Cloud deployment
+
+# Global configuration
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# API and dashboard configuration
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+# Entry points configuration
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entrypoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        options: default
+
+# Providers configuration
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: rdgtt-network
+  file:
+    filename: /etc/traefik/dynamic/rules.yml
+    watch: true
+
+# Certificate resolvers
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@rdgtt.ga
+      storage: /etc/traefik/acme.json
+      httpChallenge:
+        entryPoint: web
+
+# Logging configuration
+log:
+  level: INFO
+  filePath: /var/log/traefik/traefik.log
+
+accessLog:
+  filePath: /var/log/traefik/access.log
+
+# Metrics configuration
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
+
+# Ping configuration
+ping:
+  entryPoint: "traefik"
+
+# Health check configuration
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: rdgtt-network
+  file:
+    filename: /etc/traefik/dynamic/rules.yml
+    watch: true

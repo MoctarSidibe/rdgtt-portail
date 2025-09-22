@@ -1,0 +1,152 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: rdgtt_portail
+      POSTGRES_USER: rdgtt_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rdgtt_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - rdgtt-network
+
+  # Consul (Service Discovery)
+  consul:
+    image: consul:1.16
+    command: agent -server -bootstrap-expect=1 -client=0.0.0.0 -ui -bind=0.0.0.0
+    ports:
+      - "8500:8500"
+    networks:
+      - rdgtt-network
+
+  # Traefik (API Gateway)
+  traefik:
+    image: traefik:v3.5
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - rdgtt-network
+
+  # Usager Service
+  usager-service:
+    build: ./usager-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    ports:
+      - "8081:8081"
+    networks:
+      - rdgtt-network
+    depends_on:
+      - postgres
+      - consul
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.usager.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/usager`)"
+      - "traefik.http.services.usager.loadbalancer.server.port=8081"
+
+  # Auto-École Service
+  auto-ecole-service:
+    build: ./auto-ecole-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    ports:
+      - "8082:8082"
+    networks:
+      - rdgtt-network
+    depends_on:
+      - postgres
+      - consul
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auto-ecole.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/auto-ecole`)"
+      - "traefik.http.services.auto-ecole.loadbalancer.server.port=8082"
+
+  # Permis Service
+  permis-service:
+    build: ./permis-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    ports:
+      - "8083:8083"
+    networks:
+      - rdgtt-network
+    depends_on:
+      - postgres
+      - consul
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.permis.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/permis`)"
+      - "traefik.http.services.permis.loadbalancer.server.port=8083"
+
+  # Admin Service
+  admin-service:
+    build: ./admin-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    ports:
+      - "8085:8085"
+    networks:
+      - rdgtt-network
+    depends_on:
+      - postgres
+      - consul
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/admin`)"
+      - "traefik.http.services.admin.loadbalancer.server.port=8085"
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    networks:
+      - rdgtt-network
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN:-localhost}`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+volumes:
+  postgres_data:
+
+networks:
+  rdgtt-network:
+    driver: bridge

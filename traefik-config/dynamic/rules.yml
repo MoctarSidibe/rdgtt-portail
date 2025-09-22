@@ -1,0 +1,127 @@
+# Traefik Dynamic Rules for R-DGTT Portail
+# Service routing configuration
+
+http:
+  routers:
+    # Frontend Router
+    frontend:
+      rule: "Host(`localhost`) || Host(`rdgtt.ga`) || PathPrefix(`/`)"
+      service: frontend
+      priority: 1
+      middlewares:
+        - cors
+        - security-headers
+
+    # Usager Service Router
+    usager-service:
+      rule: "Host(`localhost`) && PathPrefix(`/api/usager`) || Host(`rdgtt.ga`) && PathPrefix(`/api/usager`)"
+      service: usager-service
+      priority: 2
+      middlewares:
+        - cors
+        - security-headers
+
+    # Auto-École Service Router
+    auto-ecole-service:
+      rule: "Host(`localhost`) && PathPrefix(`/api/auto-ecole`) || Host(`rdgtt.ga`) && PathPrefix(`/api/auto-ecole`)"
+      service: auto-ecole-service
+      priority: 2
+      middlewares:
+        - cors
+        - security-headers
+
+    # Permis Service Router
+    permis-service:
+      rule: "Host(`localhost`) && PathPrefix(`/api/permis`) || Host(`rdgtt.ga`) && PathPrefix(`/api/permis`)"
+      service: permis-service
+      priority: 2
+      middlewares:
+        - cors
+        - security-headers
+
+    # Admin Service Router
+    admin-service:
+      rule: "Host(`localhost`) && PathPrefix(`/api/admin`) || Host(`rdgtt.ga`) && PathPrefix(`/api/admin`)"
+      service: admin-service
+      priority: 2
+      middlewares:
+        - cors
+        - security-headers
+
+    # Traefik Dashboard Router
+    traefik-dashboard:
+      rule: "Host(`localhost`) && PathPrefix(`/traefik`) || Host(`rdgtt.ga`) && PathPrefix(`/traefik`)"
+      service: api@internal
+      priority: 3
+      middlewares:
+        - basic-auth
+
+  services:
+    # Frontend Service
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:3000"
+
+    # Usager Service
+    usager-service:
+      loadBalancer:
+        servers:
+          - url: "http://usager-service:8081"
+
+    # Auto-École Service
+    auto-ecole-service:
+      loadBalancer:
+        servers:
+          - url: "http://auto-ecole-service:8082"
+
+    # Permis Service
+    permis-service:
+      loadBalancer:
+        servers:
+          - url: "http://permis-service:8083"
+
+    # Admin Service
+    admin-service:
+      loadBalancer:
+        servers:
+          - url: "http://admin-service:8085"
+
+  middlewares:
+    # CORS Middleware
+    cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "http://localhost:3000"
+          - "https://rdgtt.ga"
+          - "http://rdgtt.ga"
+        accessControlAllowHeaders:
+          - "Content-Type"
+          - "Authorization"
+          - "X-Requested-With"
+        accessControlMaxAge: 100
+        addVaryHeader: true
+
+    # Security Headers Middleware
+    security-headers:
+      headers:
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"
+        customResponseHeaders:
+          X-Robots-Tag: "noindex,nofollow"
+
+    # Basic Auth for Traefik Dashboard
+    basic-auth:
+      basicAuth:
+        users:
+          - "admin:$2y$10$8K1p/a0dL2Lz.0K1p/a0dL2Lz.0K1p/a0dL2Lz.0K1p/a0dL2Lz.0"  # admin:admin123

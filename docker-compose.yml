@@ -1,0 +1,172 @@
+version: '3.8'
+
+services:
+  # Base de données
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: rdgtt_portail
+      POSTGRES_USER: rdgtt_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rdgtt_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - rdgtt-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rdgtt_user -d rdgtt_portail"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Consul
+  consul:
+    image: consul:1.16
+    command: agent -server -bootstrap-expect=1 -client=0.0.0.0 -ui -bind=0.0.0.0
+    ports:
+      - "8500:8500"
+    networks:
+      - rdgtt-network
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Traefik
+  traefik:
+    image: traefik:v3.5
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-admin@rdgtt.ga}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks:
+      - rdgtt-network
+    depends_on:
+      - consul
+
+  # Usager Service
+  usager-service:
+    build: ./usager-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    networks:
+      - rdgtt-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.usager.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/usager`)"
+      - "traefik.http.services.usager.loadbalancer.server.port=8081"
+      - "traefik.http.routers.usager.tls.certresolver=letsencrypt"
+
+  # Auto-École Service
+  auto-ecole-service:
+    build: ./auto-ecole-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    networks:
+      - rdgtt-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auto-ecole.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/auto-ecole`)"
+      - "traefik.http.services.auto-ecole.loadbalancer.server.port=8082"
+      - "traefik.http.routers.auto-ecole.tls.certresolver=letsencrypt"
+
+  # Permis Service
+  permis-service:
+    build: ./permis-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    networks:
+      - rdgtt-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.permis.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/permis`)"
+      - "traefik.http.services.permis.loadbalancer.server.port=8083"
+      - "traefik.http.routers.permis.tls.certresolver=letsencrypt"
+
+  # Admin Service
+  admin-service:
+    build: ./admin-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=production
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/rdgtt_portail
+      - SPRING_DATASOURCE_USERNAME=rdgtt_user
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-rdgtt_password}
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
+    networks:
+      - rdgtt-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api/admin`)"
+      - "traefik.http.services.admin.loadbalancer.server.port=8085"
+      - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
+
+  # Frontend
+  frontend:
+    build: ./frontend
+    networks:
+      - rdgtt-network
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN:-localhost}`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+
+volumes:
+  postgres_data:
+  letsencrypt:
+
+networks:
+  rdgtt-network:
+    driver: bridge

@@ -1,0 +1,42 @@
+# Simplified Traefik Configuration for R-DGTT Portail
+# Optimized for Hetzner Cloud deployment without SSL complexity
+
+# Global configuration
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# API and dashboard configuration
+api:
+  dashboard: true
+  insecure: true
+  debug: true
+
+# Entry points configuration
+entryPoints:
+  web:
+    address: ":80"
+
+# Providers configuration
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: rdgtt-network
+  file:
+    filename: /etc/traefik/dynamic/rules-simple.yml
+    watch: true
+
+# Logging configuration
+log:
+  level: INFO
+
+# Metrics configuration
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addServicesLabels: true
+
+# Ping configuration
+ping:
+  entryPoint: "traefik"

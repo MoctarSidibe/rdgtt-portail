@@ -1,0 +1,27 @@
+{
+  "datacenter": "rdgtt-dc",
+  "data_dir": "/consul/data",
+  "log_level": "INFO",
+  "node_name": "rdgtt-consul",
+  "server": true,
+  "bootstrap_expect": 1,
+  "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
+  "ui_config": {
+    "enabled": true
+  },
+  "connect": {
+    "enabled": true
+  },
+  "ports": {
+    "grpc": 8502
+  },
+  "acl": {
+    "enabled": false,
+    "default_policy": "allow"
+  },
+  "retry_join": [],
+  "leave_on_terminate": true,
+  "skip_leave_on_interrupt": true,
+  "rejoin_after_leave": true
+}
