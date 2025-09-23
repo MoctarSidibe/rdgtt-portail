@@ -84,12 +84,56 @@ Configuration du circuit de validation :
 }
 ```
 
-### **3. Moteur de Workflow**
-- ✅ Exécution automatique des processus
-- ✅ Gestion des délais et escalations
-- ✅ Suivi de l'historique complet
-- ✅ Redirections et rejets configurables
-- ✅ Notifications automatiques
+### **3. Moteur de Workflow Métier**
+Le système utilise un moteur de workflow configurable qui permet de :
+
+#### **Configuration Dynamique des Processus:**
+- ✅ **Types de Documents**: Création et modification sans redéploiement
+- ✅ **Étapes de Validation**: Configuration des circuits d'approbation
+- ✅ **Règles Métier**: Définition des conditions et critères
+- ✅ **Statuts Personnalisés**: Création de nouveaux statuts selon les besoins
+- ✅ **Transitions Automatiques**: Passage automatique entre étapes
+
+#### **Exemple de Configuration Workflow:**
+```json
+{
+  "workflow_name": "Permis de Conduire",
+  "document_type": "PERMIS_CONDUIRE",
+  "steps": [
+    {
+      "step_name": "Dépôt de la demande",
+      "step_code": "DEPOT",
+      "order": 1,
+      "auto_approve": true,
+      "next_step": "VERIFICATION_DOCUMENTS"
+    },
+    {
+      "step_name": "Vérification des documents",
+      "step_code": "VERIFICATION_DOCUMENTS",
+      "order": 2,
+      "required_role": "DC",
+      "department": "Direction des Contrôles",
+      "next_step": "VALIDATION_CHEF"
+    },
+    {
+      "step_name": "Validation par le chef de service",
+      "step_code": "VALIDATION_CHEF",
+      "order": 3,
+      "required_role": "CHEF_SERVICE",
+      "next_step": "APPROBATION_FINALE"
+    }
+  ]
+}
+```
+
+#### **Fonctionnalités Avancées:**
+- 🔄 **Exécution automatique** des processus
+- ⏰ **Gestion des délais** et escalations
+- 📋 **Suivi de l'historique** complet
+- 🔀 **Redirections et rejets** configurables
+- 🔔 **Notifications automatiques** à chaque étape
+- 🎯 **Règles conditionnelles** basées sur les données
+- 📊 **Tableaux de bord** de suivi en temps réel
 
 ## 🛠️ **Installation et Démarrage**
 
@@ -102,14 +146,37 @@ Configuration du circuit de validation :
 - Traefik
 
 ### **1. Configuration de la Base de Données**
-```bash
-# Créer la base de données
-psql -U postgres -c "CREATE DATABASE rdgtt_portail;"
-psql -U postgres -c "CREATE USER rdgtt_user WITH PASSWORD 'rdgtt_password';"
-psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE rdgtt_portail TO rdgtt_user;"
 
-# Initialiser le schéma complet
+#### **Option A: Avec l'utilisateur par défaut (Recommandé)**
+```bash
+# Se connecter en tant que superutilisateur postgres
+psql -U postgres
+
+# Dans psql, exécuter:
+CREATE DATABASE rdgtt_portail;
+CREATE USER rdgtt_user WITH PASSWORD 'rdgtt_password_2025';
+GRANT ALL PRIVILEGES ON DATABASE rdgtt_portail TO rdgtt_user;
+\q
+
+# Initialiser le schéma complet avec les données
+psql -U postgres -d rdgtt_portail -f database/init.sql
+```
+
+#### **Option B: Avec l'utilisateur créé**
+```bash
+# Si vous avez déjà créé l'utilisateur rdgtt_user
 psql -U rdgtt_user -d rdgtt_portail -f database/init.sql
+```
+
+#### **Vérification de l'installation:**
+```bash
+# Vérifier que les tables ont été créées
+psql -U postgres -d rdgtt_portail -c "\dt"
+
+# Vérifier les données d'exemple
+psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM users;"
+psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM document_types;"
+psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM payment_methods;"
 ```
 
 ### **2. Démarrage des Services**
@@ -164,6 +231,10 @@ npm start
 - ✅ Suivi en temps réel des demandes
 - ✅ Gestion des documents
 - ✅ Interface intuitive et responsive
+- ✅ **Tableau de bord personnalisé** avec suivi des applications
+- ✅ **Notifications in-app** pour les mises à jour
+- ✅ **Paiement Mobile Money** (Airtel Money simulé)
+- ✅ **Historique des paiements** et des transactions
 
 ### **Pour les Auto-Écoles:**
 - ✅ Gestion des candidats
@@ -172,11 +243,16 @@ npm start
 - ✅ Tableau de bord complet
 
 ### **Pour les Administrateurs:**
-- ✅ Configuration des types de documents
-- ✅ Gestion des processus de validation
-- ✅ Suivi des workflows
-- ✅ Gestion des utilisateurs et rôles
-- ✅ Configuration des départements et bureaux
+- ✅ **Configuration métier dynamique** sans redéploiement
+- ✅ **Types de documents personnalisés** avec règles spécifiques
+- ✅ **Processus de validation configurables** par type de document
+- ✅ **Workflows adaptatifs** selon les besoins métier
+- ✅ **Gestion des utilisateurs et rôles** avec permissions granulaires
+- ✅ **Configuration des départements et bureaux** hiérarchiques
+- ✅ **Monitoring des paiements** et transactions en temps réel
+- ✅ **Gestion des notifications** système personnalisables
+- ✅ **Statistiques détaillées** des utilisateurs et processus
+- ✅ **Interface d'administration** intuitive et complète
 
 ## 🎯 **Avantages du Système**
 
@@ -238,12 +314,77 @@ r_dgtt/
 - **SAF** - Service des Affaires Financières
 - **CITOYEN** - Utilisateur final
 
+### **Système de Paiement Airtel Money:**
+- ✅ **Simulation complète** pour les tests
+- ✅ **Validation du numéro** gabonais (+241XXXXXXXX)
+- ✅ **Gestion des erreurs** (solde insuffisant, PIN incorrect, etc.)
+- ✅ **Notifications automatiques** de succès/échec
+- ✅ **Historique des transactions** avec références
+- ✅ **Interface utilisateur** intuitive
+- ✅ **Prêt pour l'intégration** API Airtel réelle
+
+## 🔧 **API Admin Service - Configuration Métier**
+
+### **Endpoints Principaux:**
+
+#### **Gestion des Types de Documents:**
+```bash
+# Créer un nouveau type de document
+POST /api/admin/document-types
+{
+  "nom": "Permis de Conduire",
+  "code": "PERMIS_CONDUIRE",
+  "service_code": "permis",
+  "categorie": "principal",
+  "delai_traitement_jours": 30,
+  "frais_obligatoire": true,
+  "montant_frais": 15000
+}
+
+# Lister tous les types de documents
+GET /api/admin/document-types
+
+# Modifier un type de document
+PUT /api/admin/document-types/{id}
+```
+
+#### **Gestion des Workflows:**
+```bash
+# Créer un workflow
+POST /api/admin/workflows
+{
+  "nom": "Workflow Permis de Conduire",
+  "document_type_id": "uuid",
+  "etapes": [...]
+}
+
+# Activer/Désactiver un workflow
+PUT /api/admin/workflows/{id}/status
+{
+  "actif": true
+}
+```
+
+#### **Gestion des Statuts:**
+```bash
+# Créer un nouveau statut
+POST /api/admin/application-statuses
+{
+  "nom": "En Attente de Paiement",
+  "code": "EN_ATTENTE_PAIEMENT",
+  "couleur": "#FFA500",
+  "description": "Demande en attente de paiement"
+}
+```
+
 ## 🚀 **Déploiement en Production**
 
 ### **Recommandations:**
 - Utiliser HTTPS avec certificats SSL
-- Configurer un reverse proxy (Nginx)
-- Mettre en place la sauvegarde automatique
+- Configurer un reverse proxy (Nginx/Traefik)
+- Mettre en place des sauvegardes automatiques
+- Monitorer les performances et logs
+- Utiliser des variables d'environnement pour la configuration
 - Configurer la surveillance des services
 - Implémenter la haute disponibilité
 
