@@ -47,6 +47,8 @@ Système complet de gestion des transports terrestres pour le Ministère des Tra
 - ✅ **Docker Compose** - Orchestration des services
 - ✅ **Hetzner Cloud** - Déploiement optimisé
 - ✅ **Scripts de déploiement** - Installation automatique
+- ✅ **Multi-stage Docker builds** - Optimisation des performances
+- ✅ **Maven dependency caching** - Builds plus rapides
 
 ## 🎛️ **Système de Configuration Admin**
 
@@ -378,6 +380,13 @@ POST /api/admin/application-statuses
 ```
 
 ## 🚀 **Déploiement en Production**
+
+### **Déploiement sur Hetzner Cloud (Recommandé):**
+- ✅ **Guide complet** - `DEPLOYMENT_HETZNER.md`
+- ✅ **Déploiement manuel** - Étape par étape pour l'apprentissage
+- ✅ **Workflow de développement** - Mise à jour GitHub → Serveur
+- ✅ **Optimisations Docker** - Multi-stage builds pour des déploiements rapides
+- ✅ **Coût optimisé** - €3.29/mois pour 2GB RAM
 
 ### **Recommandations:**
 - Utiliser HTTPS avec certificats SSL

@@ -367,6 +367,25 @@ docker compose exec -T postgres psql -U rdgtt_user rdgtt_portail < backup-202501
 
 ### **4.4 Gestion des Erreurs Courantes**
 
+#### **Build Docker très lent ou échoue**
+```bash
+# 1. Si le build prend trop de temps, essayer le simple compose
+docker compose -f docker-compose.simple.yml up -d
+
+# 2. Ou construire un service à la fois
+docker compose build usager-service
+docker compose up -d usager-service
+
+# 3. Vérifier l'espace disque disponible
+df -h
+
+# 4. Nettoyer les images Docker inutilisées
+docker system prune -f
+
+# 5. Vérifier la mémoire disponible
+free -h
+```
+
 #### **Service ne démarre pas**
 ```bash
 # 1. Vérifier les logs du service
@@ -381,6 +400,18 @@ docker compose restart nom-du-service
 # 4. Si nécessaire, reconstruire l'image
 docker compose build nom-du-service
 docker compose up -d nom-du-service
+```
+
+#### **Erreur de build Maven**
+```bash
+# 1. Vérifier que le pom.xml est valide
+docker compose build --no-cache nom-du-service
+
+# 2. Construire avec plus de mémoire
+docker compose build --build-arg MAVEN_OPTS="-Xmx1024m" nom-du-service
+
+# 3. Vérifier les logs de build détaillés
+docker compose build --progress=plain nom-du-service
 ```
 
 #### **Problème de base de données**
