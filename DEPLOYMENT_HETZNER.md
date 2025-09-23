@@ -199,41 +199,225 @@ df -h
 free -h
 ```
 
-## 🚀 **Étape 4: Mise à Jour du Code sur GitHub**
+## 🚀 **Étape 4: Workflow de Développement - Mise à Jour GitHub et Serveur**
 
-### **4.1 Pousser les Dernières Modifications (Depuis votre Machine)**
+### **4.1 Workflow de Développement Complet**
+
+#### **A. Développement Local (Sur votre Machine Windows)**
 ```bash
-# Sur votre machine Windows, dans le dossier du projet
+# 1. Aller dans le dossier du projet
 cd C:\Users\user\OneDrive\Documents\r_dgtt
 
-# Vérifier le statut Git
+# 2. Vérifier le statut Git
 git status
 
-# Ajouter tous les fichiers modifiés
+# 3. Ajouter tous les fichiers modifiés
 git add .
 
-# Créer un commit avec les dernières modifications
-git commit -m "feat: Complete Metier Workflow system with user interface and Airtel Money simulation
+# 4. Créer un commit avec un message descriptif
+git commit -m "feat: Description de vos modifications
 
-- Added comprehensive user interface controllers
-- Implemented Airtel Money payment simulation
-- Added notification system for users and candidates
-- Updated database schema with user tracking tables
-- Added environment variable configuration
-- Fixed all compilation errors and warnings
-- Updated documentation with Metier Workflow details"
+- Détail 1 de vos changements
+- Détail 2 de vos changements
+- Détail 3 de vos changements"
 
-# Pousser vers GitHub
+# 5. Pousser vers GitHub
 git push origin main
 
-# Vérifier que le push a réussi
+# 6. Vérifier que le push a réussi
 git log --oneline -5
 ```
 
-### **4.2 Vérifier sur GitHub**
+#### **B. Déploiement sur le Serveur (Sur Hetzner)**
+```bash
+# 1. Se connecter au serveur
+ssh root@168.119.123.247
+
+# 2. Aller dans le dossier du projet
+cd rdgtt-portail
+
+# 3. Récupérer les dernières modifications depuis GitHub
+git pull origin main
+
+# 4. Vérifier que les modifications ont été récupérées
+git log --oneline -3
+
+# 5. Arrêter les services pour la mise à jour
+docker compose down
+
+# 6. Reconstruire les images avec les nouvelles modifications
+docker compose build
+
+# 7. Redémarrer tous les services
+docker compose up -d
+
+# 8. Vérifier que tous les services sont en cours d'exécution
+docker compose ps
+
+# 9. Vérifier les logs pour s'assurer qu'il n'y a pas d'erreurs
+docker compose logs --tail=20
+```
+
+### **4.2 Workflow de Développement Quotidien**
+
+#### **Scénario 1: Modification du Code Backend (Java)**
+```bash
+# Sur votre machine Windows:
+# 1. Modifier le code Java dans les services
+# 2. Tester localement si possible
+# 3. Commit et push vers GitHub
+git add .
+git commit -m "fix: Correction du service usager"
+git push origin main
+
+# Sur le serveur Hetzner:
+# 1. Récupérer les modifications
+git pull origin main
+
+# 2. Redémarrer seulement le service modifié
+docker compose restart usager-service
+
+# 3. Vérifier les logs
+docker compose logs usager-service
+```
+
+#### **Scénario 2: Modification du Frontend (React)**
+```bash
+# Sur votre machine Windows:
+# 1. Modifier le code React
+# 2. Commit et push vers GitHub
+git add .
+git commit -m "feat: Nouvelle interface utilisateur"
+git push origin main
+
+# Sur le serveur Hetzner:
+# 1. Récupérer les modifications
+git pull origin main
+
+# 2. Reconstruire et redémarrer le frontend
+docker compose build frontend
+docker compose up -d frontend
+
+# 3. Vérifier que le frontend fonctionne
+curl -I http://localhost
+```
+
+#### **Scénario 3: Modification de la Base de Données**
+```bash
+# Sur votre machine Windows:
+# 1. Modifier database/init.sql
+# 2. Commit et push vers GitHub
+git add database/init.sql
+git commit -m "feat: Nouvelle table utilisateurs"
+git push origin main
+
+# Sur le serveur Hetzner:
+# 1. Récupérer les modifications
+git pull origin main
+
+# 2. Arrêter tous les services
+docker compose down
+
+# 3. Supprimer le volume de la base de données (ATTENTION: perte de données!)
+docker volume rm rdgtt-portail_postgres_data
+
+# 4. Redémarrer avec la nouvelle base de données
+docker compose up -d
+
+# 5. Vérifier que la base de données est initialisée
+docker compose exec postgres psql -U rdgtt_user -d rdgtt_portail -c "SELECT COUNT(*) FROM users;"
+```
+
+### **4.3 Commandes de Maintenance Quotidienne**
+
+#### **Vérification de l'État du Système**
+```bash
+# Sur le serveur Hetzner:
+# 1. Vérifier le statut de tous les services
+docker compose ps
+
+# 2. Vérifier l'utilisation des ressources
+htop
+
+# 3. Vérifier l'espace disque
+df -h
+
+# 4. Vérifier les logs récents
+docker compose logs --tail=50
+
+# 5. Vérifier la connectivité des services
+curl -I http://localhost:8081/actuator/health  # Usager Service
+curl -I http://localhost:8082/actuator/health  # Auto-École Service
+curl -I http://localhost:8083/actuator/health  # Permis Service
+curl -I http://localhost:8085/actuator/health  # Admin Service
+```
+
+#### **Sauvegarde de la Base de Données**
+```bash
+# Sur le serveur Hetzner:
+# 1. Créer une sauvegarde
+docker compose exec postgres pg_dump -U rdgtt_user rdgtt_portail > backup-$(date +%Y%m%d-%H%M).sql
+
+# 2. Vérifier la taille de la sauvegarde
+ls -lh backup-*.sql
+
+# 3. Tester la restauration (optionnel)
+docker compose exec -T postgres psql -U rdgtt_user rdgtt_portail < backup-20250120-1200.sql
+```
+
+### **4.4 Gestion des Erreurs Courantes**
+
+#### **Service ne démarre pas**
+```bash
+# 1. Vérifier les logs du service
+docker compose logs nom-du-service
+
+# 2. Vérifier la configuration
+docker compose config
+
+# 3. Redémarrer le service
+docker compose restart nom-du-service
+
+# 4. Si nécessaire, reconstruire l'image
+docker compose build nom-du-service
+docker compose up -d nom-du-service
+```
+
+#### **Problème de base de données**
+```bash
+# 1. Vérifier que PostgreSQL fonctionne
+docker compose ps postgres
+
+# 2. Vérifier les logs PostgreSQL
+docker compose logs postgres
+
+# 3. Tester la connexion
+docker compose exec postgres psql -U rdgtt_user -d rdgtt_portail -c "SELECT 1;"
+
+# 4. Redémarrer PostgreSQL si nécessaire
+docker compose restart postgres
+```
+
+#### **Problème de mémoire**
+```bash
+# 1. Vérifier l'utilisation de la mémoire
+free -h
+
+# 2. Vérifier les processus qui consomment le plus
+htop
+
+# 3. Créer un fichier swap si nécessaire
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+```
+
+### **4.5 Vérification sur GitHub**
 1. Aller sur [https://github.com/MoctarSidibe/rdgtt-portail](https://github.com/MoctarSidibe/rdgtt-portail)
 2. Vérifier que le dernier commit est visible
 3. Vérifier que tous les nouveaux fichiers sont présents
+4. Utiliser l'historique des commits pour suivre les modifications
 
 ## 🚀 **Étape 5: Déploiement de l'Application sur Hetzner**
 
@@ -314,7 +498,7 @@ SPRING_PROFILES_ACTIVE=production
 - Appuyer sur `Y` pour confirmer
 - Appuyer sur `Entrée` pour sauvegarder
 
-### **4.4 Obtenir l'IP Publique du Serveur**
+### **5.4 Obtenir l'IP Publique du Serveur**
 ```bash
 # Obtenir l'IP publique du serveur
 curl -s ifconfig.me
