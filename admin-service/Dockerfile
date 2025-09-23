@@ -1,23 +1,27 @@
-# Dockerfile pour Admin Service
-FROM openjdk:17-jdk-slim
+# Multi-stage build pour optimiser la taille et la vitesse
+FROM maven:3.8.6-openjdk-17-slim AS build
 
 WORKDIR /app
 
-# Copier le pom.xml et télécharger les dépendances
+# Copier seulement le pom.xml d'abord pour le cache des dépendances
 COPY pom.xml .
+
+# Télécharger les dépendances (cache si pom.xml n'a pas changé)
+RUN mvn dependency:go-offline -B
+
+# Copier le code source
 COPY src ./src
 
-# Installer Maven et construire l'application
-RUN apt-get update && \
-    apt-get install -y maven && \
-    mvn clean package -DskipTests && \
-    apt-get remove -y maven && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Construire l'application
+RUN mvn clean package -DskipTests -B
 
-# Copier le JAR construit
-COPY target/*.jar app.jar
+# Stage de production
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+# Copier le JAR depuis le stage de build
+COPY --from=build /app/target/*.jar app.jar
 
 # Exposer le port
 EXPOSE 8085
