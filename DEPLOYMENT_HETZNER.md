@@ -199,7 +199,51 @@ df -h
 free -h
 ```
 
-## 🚀 **Étape 4: Workflow de Développement - Mise à Jour GitHub et Serveur**
+## 🔐 **Étape 4: Configuration Docker Secrets (Sécurité)**
+
+### **4.1 Créer les Secrets Docker**
+
+```bash
+# Créer le répertoire des secrets
+mkdir -p secrets
+
+# Créer les fichiers de secrets
+echo "rdgtt_password" > secrets/db_password.txt
+echo "rdgtt_jwt_secret_2025" > secrets/jwt_secret.txt
+echo "admin@rdgtt.ga" > secrets/acme_email.txt
+
+# Définir les permissions de sécurité
+chmod 600 secrets/*.txt
+
+# Vérifier les fichiers créés
+ls -la secrets/
+```
+
+### **4.2 Avantages de Docker Secrets**
+
+- ✅ **Sécurité renforcée** - Pas de mots de passe en texte clair
+- ✅ **Chiffrement au repos** - Les secrets sont chiffrés dans Docker
+- ✅ **Contrôle d'accès** - Seuls les services autorisés y accèdent
+- ✅ **Non visible dans les processus** - Plus sécurisé que les variables d'environnement
+- ✅ **Non commité dans Git** - Le dossier `secrets/` est dans `.gitignore`
+
+### **4.3 Tester Docker Secrets**
+
+```bash
+# Arrêter les services actuels
+docker compose down
+
+# Démarrer avec Docker Secrets
+docker compose up -d
+
+# Vérifier que les secrets sont montés
+docker compose exec usager-service ls -la /run/secrets/
+
+# Vérifier le contenu des secrets
+docker compose exec usager-service cat /run/secrets/db_password
+```
+
+## 🚀 **Étape 5: Workflow de Développement - Mise à Jour GitHub et Serveur**
 
 ### **4.1 Workflow de Développement Complet**
 

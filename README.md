@@ -45,6 +45,7 @@ Système complet de gestion des transports terrestres pour le Ministère des Tra
 
 ### **Deployment Ready:**
 - ✅ **Docker Compose** - Orchestration des services
+- ✅ **Docker Secrets** - Gestion sécurisée des mots de passe
 - ✅ **Hetzner Cloud** - Déploiement optimisé
 - ✅ **Scripts de déploiement** - Installation automatique
 - ✅ **Multi-stage Docker builds** - Optimisation des performances
@@ -379,11 +380,37 @@ POST /api/admin/application-statuses
 }
 ```
 
+## 🔐 **Sécurité - Docker Secrets**
+
+### **Gestion Sécurisée des Mots de Passe**
+Le système utilise Docker Secrets pour une gestion sécurisée des données sensibles:
+
+```bash
+# Créer les secrets
+mkdir -p secrets
+echo "rdgtt_password" > secrets/db_password.txt
+echo "rdgtt_jwt_secret_2025" > secrets/jwt_secret.txt
+echo "admin@rdgtt.ga" > secrets/acme_email.txt
+chmod 600 secrets/*.txt
+
+# Démarrer avec Docker Secrets
+docker compose up -d
+```
+
+### **Avantages de Docker Secrets:**
+- ✅ **Chiffrement au repos** - Les secrets sont chiffrés dans Docker
+- ✅ **Contrôle d'accès** - Seuls les services autorisés y accèdent
+- ✅ **Non visible dans les processus** - Plus sécurisé que les variables d'environnement
+- ✅ **Non commité dans Git** - Le dossier `secrets/` est dans `.gitignore`
+
+Voir le guide complet: [DOCKER_SECRETS_SETUP.md](DOCKER_SECRETS_SETUP.md)
+
 ## 🚀 **Déploiement en Production**
 
 ### **Déploiement sur Hetzner Cloud (Recommandé):**
 - ✅ **Guide complet** - `DEPLOYMENT_HETZNER.md`
 - ✅ **Déploiement manuel** - Étape par étape pour l'apprentissage
+- ✅ **Docker Secrets** - Gestion sécurisée des mots de passe
 - ✅ **Workflow de développement** - Mise à jour GitHub → Serveur
 - ✅ **Optimisations Docker** - Multi-stage builds pour des déploiements rapides
 - ✅ **Coût optimisé** - €3.29/mois pour 2GB RAM
