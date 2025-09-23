@@ -1,5 +1,5 @@
 # Multi-stage build pour optimiser la taille et la vitesse
-FROM maven:3.8.6-openjdk-17-slim AS build
+FROM maven:3.8.5-openjdk-17 AS build
 
 WORKDIR /app
 
