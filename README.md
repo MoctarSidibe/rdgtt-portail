@@ -380,28 +380,29 @@ POST /api/admin/application-statuses
 }
 ```
 
-## 🔐 **Sécurité - Docker Secrets**
+## 🔐 **Sécurité - Variables d'Environnement**
 
 ### **Gestion Sécurisée des Mots de Passe**
-Le système utilise Docker Secrets pour une gestion sécurisée des données sensibles:
+Le système utilise des variables d'environnement pour une gestion sécurisée des données sensibles:
 
 ```bash
-# Créer les secrets
-mkdir -p secrets
-echo "rdgtt_password" > secrets/db_password.txt
-echo "rdgtt_jwt_secret_2025" > secrets/jwt_secret.txt
-echo "admin@rdgtt.ga" > secrets/acme_email.txt
-chmod 600 secrets/*.txt
+# Créer le fichier .env
+echo "POSTGRES_PASSWORD=rdgtt_password" > .env
+echo "DOMAIN=localhost" >> .env
+echo "ACME_EMAIL=admin@rdgtt.ga" >> .env
+echo "JWT_SECRET=rdgtt_jwt_secret_2025" >> .env
+echo "SPRING_PROFILES_ACTIVE=production" >> .env
 
-# Démarrer avec Docker Secrets
+# Démarrer avec les variables d'environnement
 docker compose up -d
 ```
 
-### **Avantages de Docker Secrets:**
-- ✅ **Chiffrement au repos** - Les secrets sont chiffrés dans Docker
-- ✅ **Contrôle d'accès** - Seuls les services autorisés y accèdent
-- ✅ **Non visible dans les processus** - Plus sécurisé que les variables d'environnement
-- ✅ **Non commité dans Git** - Le dossier `secrets/` est dans `.gitignore`
+### **Avantages des Variables d'Environnement:**
+- ✅ **Configuration simple** - Facile à gérer et modifier
+- ✅ **Compatible** - Fonctionne avec tous les services
+- ✅ **Flexible** - Peut être différent par environnement
+- ✅ **Non commité dans Git** - Le fichier `.env` est dans `.gitignore`
+- ✅ **Déploiement rapide** - Pas de complexité supplémentaire
 
 Voir le guide complet: [DOCKER_SECRETS_SETUP.md](DOCKER_SECRETS_SETUP.md)
 

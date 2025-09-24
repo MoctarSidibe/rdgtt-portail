@@ -3,6 +3,9 @@
 ## Overview
 This guide explains how to implement Docker Secrets for secure configuration management in the R-DGTT Portail project.
 
+## ⚠️ **Current Status: Environment Variables**
+Due to compatibility issues with Docker Secrets in the current setup, the project now uses **environment variables** for configuration management. This provides a simpler and more reliable approach for deployment.
+
 ## 🚀 Step-by-Step Implementation
 
 ### Step 1: Create Secrets Directory

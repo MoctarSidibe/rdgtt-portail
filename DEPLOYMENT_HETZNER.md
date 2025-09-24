@@ -199,48 +199,44 @@ df -h
 free -h
 ```
 
-## 🔐 **Étape 4: Configuration Docker Secrets (Sécurité)**
+## 🔐 **Étape 4: Configuration des Variables d'Environnement (Sécurité)**
 
-### **4.1 Créer les Secrets Docker**
+### **4.1 Créer le Fichier .env**
 
 ```bash
-# Créer le répertoire des secrets
-mkdir -p secrets
+# Créer le fichier .env avec les variables d'environnement
+echo "POSTGRES_PASSWORD=rdgtt_password" > .env
+echo "DOMAIN=168.119.123.247" >> .env
+echo "ACME_EMAIL=admin@rdgtt.ga" >> .env
+echo "JWT_SECRET=rdgtt_jwt_secret_2025" >> .env
+echo "SPRING_PROFILES_ACTIVE=production" >> .env
 
-# Créer les fichiers de secrets
-echo "rdgtt_password" > secrets/db_password.txt
-echo "rdgtt_jwt_secret_2025" > secrets/jwt_secret.txt
-echo "admin@rdgtt.ga" > secrets/acme_email.txt
-
-# Définir les permissions de sécurité
-chmod 600 secrets/*.txt
-
-# Vérifier les fichiers créés
-ls -la secrets/
+# Vérifier le fichier créé
+cat .env
 ```
 
-### **4.2 Avantages de Docker Secrets**
+### **4.2 Avantages des Variables d'Environnement**
 
-- ✅ **Sécurité renforcée** - Pas de mots de passe en texte clair
-- ✅ **Chiffrement au repos** - Les secrets sont chiffrés dans Docker
-- ✅ **Contrôle d'accès** - Seuls les services autorisés y accèdent
-- ✅ **Non visible dans les processus** - Plus sécurisé que les variables d'environnement
-- ✅ **Non commité dans Git** - Le dossier `secrets/` est dans `.gitignore`
+- ✅ **Configuration simple** - Facile à gérer et modifier
+- ✅ **Compatible** - Fonctionne avec tous les services
+- ✅ **Flexible** - Peut être différent par environnement
+- ✅ **Non commité dans Git** - Le fichier `.env` est dans `.gitignore`
+- ✅ **Déploiement rapide** - Pas de complexité supplémentaire
 
-### **4.3 Tester Docker Secrets**
+### **4.3 Tester la Configuration**
 
 ```bash
 # Arrêter les services actuels
 docker compose down
 
-# Démarrer avec Docker Secrets
+# Démarrer avec les variables d'environnement
 docker compose up -d
 
-# Vérifier que les secrets sont montés
-docker compose exec usager-service ls -la /run/secrets/
+# Vérifier que les services démarrent correctement
+docker compose ps
 
-# Vérifier le contenu des secrets
-docker compose exec usager-service cat /run/secrets/db_password
+# Vérifier les logs
+docker compose logs --tail=20 usager-service
 ```
 
 ## 🚀 **Étape 5: Workflow de Développement - Mise à Jour GitHub et Serveur**
