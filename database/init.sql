@@ -58,12 +58,16 @@ CREATE TABLE bureaus (
 CREATE TABLE auto_ecoles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nom VARCHAR(255) NOT NULL,
-    code VARCHAR(50) UNIQUE NOT NULL,
-    adresse TEXT,
+    adresse TEXT NOT NULL,
     telephone VARCHAR(20),
     email VARCHAR(255),
+    directeur_nom VARCHAR(255) NOT NULL,
+    directeur_telephone VARCHAR(20),
     statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    numero_agrement VARCHAR(100),
+    date_agrement DATE,
+    date_expiration DATE,
+    user_id UUID REFERENCES users(id) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -72,25 +76,31 @@ CREATE TABLE auto_ecoles (
 CREATE TABLE auto_ecole_documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     auto_ecole_id UUID REFERENCES auto_ecoles(id) ON DELETE CASCADE,
-    nom_document VARCHAR(255) NOT NULL,
     type_document VARCHAR(100) NOT NULL,
-    chemin_fichier VARCHAR(500),
-    statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    nom_fichier VARCHAR(255) NOT NULL,
+    chemin_fichier VARCHAR(500) NOT NULL,
+    taille_fichier BIGINT,
+    mime_type VARCHAR(100),
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Candidates table
 CREATE TABLE candidats (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nom VARCHAR(100) NOT NULL,
+    nom_famille VARCHAR(100) NOT NULL,
+    nom_jeune_fille VARCHAR(100),
     prenom VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    telephone VARCHAR(20),
-    date_naissance DATE,
-    lieu_naissance VARCHAR(100),
-    adresse TEXT,
-    auto_ecole_id UUID REFERENCES auto_ecoles(id),
-    statut VARCHAR(50) DEFAULT 'INSCRIT',
+    date_naissance DATE NOT NULL,
+    lieu_naissance VARCHAR(100) NOT NULL,
+    nationalite VARCHAR(100) NOT NULL,
+    telephone VARCHAR(20) NOT NULL,
+    email VARCHAR(255),
+    photo VARCHAR(500),
+    auto_ecole_id UUID REFERENCES auto_ecoles(id) NOT NULL,
+    statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
+    numero_dossier VARCHAR(100),
+    numero_license VARCHAR(100),
+    commentaire TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -99,11 +109,12 @@ CREATE TABLE candidats (
 CREATE TABLE candidat_documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     candidat_id UUID REFERENCES candidats(id) ON DELETE CASCADE,
-    nom_document VARCHAR(255) NOT NULL,
     type_document VARCHAR(100) NOT NULL,
-    chemin_fichier VARCHAR(500),
-    statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    nom_fichier VARCHAR(255) NOT NULL,
+    chemin_fichier VARCHAR(500) NOT NULL,
+    taille_fichier BIGINT,
+    mime_type VARCHAR(100),
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ==============================================
@@ -274,9 +285,9 @@ INSERT INTO bureaus (nom, code, description, departement_id) VALUES
 ('Bureau des Licences', 'BL', 'Bureau des licences de transport', (SELECT id FROM departments WHERE code = 'DC'));
 
 -- Insert sample auto-écoles
-INSERT INTO auto_ecoles (nom, code, adresse, telephone, email, statut) VALUES
-('Auto-École Excellence', 'AE001', 'Libreville, Quartier Montagne Sainte', '+241 01 23 45 67', 'excellence@autoecole.ga', 'VALIDE'),
-('Auto-École Pro', 'AE002', 'Libreville, Quartier Glass', '+241 01 23 45 68', 'pro@autoecole.ga', 'VALIDE');
+INSERT INTO auto_ecoles (nom, adresse, telephone, email, directeur_nom, directeur_telephone, statut, user_id) VALUES
+('Auto-École Excellence', 'Libreville, Quartier Montagne Sainte', '+241 01 23 45 67', 'excellence@autoecole.ga', 'Jean Excellence', '+241 01 23 45 67', 'APPROUVE', (SELECT id FROM users WHERE email = 'admin@rdgtt.ga')),
+('Auto-École Pro', 'Libreville, Quartier Glass', '+241 01 23 45 68', 'pro@autoecole.ga', 'Marie Pro', '+241 01 23 45 68', 'APPROUVE', (SELECT id FROM users WHERE email = 'admin@rdgtt.ga'));
 
 -- Insert sample document types
 INSERT INTO document_types (nom, code, service_code, categorie, delai_traitement_jours, frais_obligatoire, montant_frais) VALUES
