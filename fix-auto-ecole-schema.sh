@@ -19,7 +19,7 @@ if command -v docker &> /dev/null; then
         echo "PostgreSQL container is running. Applying migration..."
         
         # Apply the migration script
-        docker exec -i $(docker ps -q --filter "name=postgres") psql -U rdgtt_user -d rdgtt_portail < /workspace/database/migration-fix-documents.sql
+        docker exec -i $(docker ps -q --filter "name=postgres") psql -U rdgtt_user -d rdgtt_portail < database/migration-fix-documents.sql
         
         if [ $? -eq 0 ]; then
             echo "✅ Database migration applied successfully!"
