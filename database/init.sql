@@ -72,9 +72,12 @@ CREATE TABLE auto_ecoles (
 CREATE TABLE auto_ecole_documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     auto_ecole_id UUID REFERENCES auto_ecoles(id) ON DELETE CASCADE,
-    nom_document VARCHAR(255) NOT NULL,
+    nom_fichier VARCHAR(255) NOT NULL,
     type_document VARCHAR(100) NOT NULL,
-    chemin_fichier VARCHAR(500),
+    chemin_fichier VARCHAR(500) NOT NULL,
+    taille_fichier BIGINT,
+    mime_type VARCHAR(255),
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -99,9 +102,12 @@ CREATE TABLE candidats (
 CREATE TABLE candidat_documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     candidat_id UUID REFERENCES candidats(id) ON DELETE CASCADE,
-    nom_document VARCHAR(255) NOT NULL,
+    nom_fichier VARCHAR(255) NOT NULL,
     type_document VARCHAR(100) NOT NULL,
-    chemin_fichier VARCHAR(500),
+    chemin_fichier VARCHAR(500) NOT NULL,
+    taille_fichier BIGINT,
+    mime_type VARCHAR(255),
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

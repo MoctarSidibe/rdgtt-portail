@@ -98,7 +98,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.admin.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/admin`)"
-      - "traefik.http.services.admin.loadbalancer.server.port=8082"
+      - "traefik.http.services.admin.loadbalancer.server.port=8085"
 
   permis-service:
     build: ./permis-service
@@ -144,7 +144,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.auto-ecole.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/auto-ecole`)"
-      - "traefik.http.services.auto-ecole.loadbalancer.server.port=8084"
+      - "traefik.http.services.auto-ecole.loadbalancer.server.port=8082"
 
   frontend:
     build: ./frontend
