@@ -100,7 +100,7 @@ public class UserService {
         userRepository.save(user);
     }
     
-    public UserDTO getUserById(UUID id) {
+    public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         return convertToDTO(user);
@@ -136,7 +136,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
     
-    public void updateLastLogin(UUID userId) {
+    public void updateLastLogin(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         user.setLastLogin(LocalDateTime.now());

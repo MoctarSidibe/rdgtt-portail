@@ -31,7 +31,7 @@ public class NotificationService {
     /**
      * Créer une notification pour un utilisateur
      */
-    public Notification createNotification(UUID userId, String notificationTypeCode, 
+    public Notification createNotification(Long userId, String notificationTypeCode, 
                                          String titre, String message, 
                                          Map<String, Object> variables) {
         
