@@ -48,7 +48,7 @@ function HomePage() {
         'Processus d\'inspection',
         'Génération des permis d\'exploitation'
       ],
-      action: () => navigate('/auto-ecoles')
+      action: () => navigate('/login')
     },
     {
       id: 'permis-conduire',
@@ -66,7 +66,7 @@ function HomePage() {
         'Conversion et échange',
         'Attestation d\'authenticité'
       ],
-      action: () => navigate('/permis')
+      action: () => navigate('/login')
     },
     {
       id: 'fiche-enregistrement',
