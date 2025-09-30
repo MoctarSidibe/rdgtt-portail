@@ -40,7 +40,7 @@ function HomePage() {
       icon: <SchoolIcon sx={{ fontSize: 60 }} />,
       status: 'available',
       statusText: 'Disponible',
-      color: '#1976d2',
+      color: '#1a237e',
       features: [
         'Inscription des auto-écoles',
         'Gestion des candidats',
@@ -157,7 +157,7 @@ function HomePage() {
       <Paper
         elevation={0}
         sx={{
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)',
           color: 'white',
           py: 8,
           mb: 4,
@@ -165,18 +165,42 @@ function HomePage() {
       >
         <Container maxWidth="lg">
           <Box textAlign="center">
-            <Avatar
+            <Box
               sx={{
-                width: 120,
-                height: 120,
-                mx: 'auto',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 3,
                 mb: 3,
-                bgcolor: 'rgba(255,255,255,0.2)',
-                fontSize: '3rem',
               }}
             >
-              🚗
-            </Avatar>
+              <Box
+                component="img"
+                src="/dgttlogo.jpg"
+                alt="DGTT Logo"
+                sx={{
+                  width: 120,
+                  height: 120,
+                  objectFit: 'contain',
+                  borderRadius: 2,
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  p: 1,
+                }}
+              />
+              <Box
+                component="img"
+                src="/emblemgabon.png"
+                alt="Emblème du Gabon"
+                sx={{
+                  width: 100,
+                  height: 100,
+                  objectFit: 'contain',
+                  borderRadius: 2,
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  p: 1,
+                }}
+              />
+            </Box>
             <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
               R-DGTT Portail
             </Typography>
