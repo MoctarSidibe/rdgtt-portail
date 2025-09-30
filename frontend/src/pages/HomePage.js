@@ -182,6 +182,7 @@ function HomePage() {
                 alignItems: 'center',
                 gap: 3,
                 mb: 3,
+                flexWrap: 'wrap',
               }}
             >
               <Box
@@ -210,6 +211,19 @@ function HomePage() {
                   p: 1,
                 }}
               />
+              <Box
+                component="img"
+                src="/rengus-logo.jpg"
+                alt="Rengus Logo"
+                sx={{
+                  width: 120,
+                  height: 120,
+                  objectFit: 'contain',
+                  borderRadius: 2,
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  p: 1,
+                }}
+              />
             </Box>
             <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
               R-DGTT Portail
@@ -218,7 +232,7 @@ function HomePage() {
               Ministère des Transports, de la Marine Marchande et de la Logistique du Gabon
             </Typography>
             <Typography variant="h6" sx={{ opacity: 0.8, maxWidth: 600, mx: 'auto' }}>
-              Plateforme numérique pour la gestion des services de transport et de conduite
+              Plateforme numérique pour la gestion des services de transport
             </Typography>
           </Box>
         </Container>
