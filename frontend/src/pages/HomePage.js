@@ -161,6 +161,16 @@ function HomePage() {
           color: 'white',
           py: 8,
           mb: 4,
+          position: 'relative',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '8px',
+            background: 'linear-gradient(90deg, #00a651 0%, #00a651 33.33%, #fcd116 33.33%, #fcd116 66.66%, #1a237e 66.66%, #1a237e 100%)',
+          }
         }}
       >
         <Container maxWidth="lg">
