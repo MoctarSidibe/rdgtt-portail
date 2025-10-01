@@ -201,19 +201,19 @@ function HomePage() {
               <Box
                 component="img"
                 src="/aninf.png"
-                alt="Emblème du Gabon"
+                alt="ANINF Logo"
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: 120,
+                  height: 120,
                   objectFit: 'contain',
-                  borderRadius: 2,
+                  borderRadius: '50%',
                   bgcolor: 'rgba(255,255,255,0.1)',
                   p: 1,
                 }}
               />
             </Box>
             <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
-              R-DGTT Portail
+              DGTT Portail
             </Typography>
             <Typography variant="h5" component="h2" sx={{ mb: 2, opacity: 0.9 }}>
               Ministère des Transports, de la Marine Marchande et de la Logistique du Gabon
