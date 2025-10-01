@@ -27,7 +27,7 @@ public class PaymentMethod {
     @Column(name = "actif")
     private Boolean actif = true;
     
-    @Column(name = "frais_pourcentage", precision = 5, scale = 2)
+    @Column(name = "frais_pourcentage")
     private BigDecimal fraisPourcentage = BigDecimal.ZERO;
     
     @CreationTimestamp

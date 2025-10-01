@@ -24,7 +24,7 @@ public class DocumentType {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     
-    @Column(name = "prix", precision = 10, scale = 2)
+    @Column(name = "prix")
     private Double prix;
     
     @Column(name = "delai_traitement_jours")
