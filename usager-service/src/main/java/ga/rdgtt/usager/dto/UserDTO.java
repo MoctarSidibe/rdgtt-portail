@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class UserDTO {
     
-    private Long id;
+    private UUID id;
     
     @NotBlank(message = "Le nom de famille est obligatoire")
     private String nomFamille;
@@ -56,11 +56,11 @@ public class UserDTO {
     public UserDTO() {}
     
     // Getters and Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
     
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     
