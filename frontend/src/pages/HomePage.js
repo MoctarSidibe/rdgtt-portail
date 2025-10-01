@@ -200,7 +200,7 @@ function HomePage() {
               />
               <Box
                 component="img"
-                src="/emblemgabon.png"
+                src="/aninf.png"
                 alt="Emblème du Gabon"
                 sx={{
                   width: 100,
