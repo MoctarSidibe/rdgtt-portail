@@ -15,7 +15,7 @@ public class Notification {
     private UUID id;
     
     @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    private Long userId;
     
     @Column(name = "notification_type_id")
     private UUID notificationTypeId;
@@ -60,8 +60,8 @@ public class Notification {
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     
-    public UUID getUserId() { return userId; }
-    public void setUserId(UUID userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
     
     public UUID getNotificationTypeId() { return notificationTypeId; }
     public void setNotificationTypeId(UUID notificationTypeId) { this.notificationTypeId = notificationTypeId; }
