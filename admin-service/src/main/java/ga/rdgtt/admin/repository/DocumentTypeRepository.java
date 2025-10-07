@@ -15,4 +15,8 @@ public interface DocumentTypeRepository extends JpaRepository<DocumentType, UUID
     List<DocumentType> findByActifTrue();
     
     List<DocumentType> findByServiceCodeAndActifTrue(String serviceCode);
+    
+    Optional<DocumentType> findByCode(String code);
+    
+    List<DocumentType> findByCategorie(String categorie);
 }

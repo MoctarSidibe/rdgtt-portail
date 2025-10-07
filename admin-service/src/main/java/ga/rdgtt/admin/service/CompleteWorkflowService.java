@@ -217,15 +217,15 @@ public class CompleteWorkflowService {
      */
     public Object getWorkflowStatistics() {
         long totalWorkflows = workflowInstanceRepository.count();
-        long enCours = workflowInstanceRepository.countByStatut("EN_COURS");
-        long termines = workflowInstanceRepository.countByStatut("TERMINE");
-        long rejetes = workflowInstanceRepository.countByStatut("REJETE");
+        long enCoursCount = workflowInstanceRepository.countByStatut("EN_COURS");
+        long terminesCount = workflowInstanceRepository.countByStatut("TERMINE");
+        long rejetesCount = workflowInstanceRepository.countByStatut("REJETE");
         
         return new Object() {
             public final long total = totalWorkflows;
-            public final long enCours = enCours;
-            public final long termines = termines;
-            public final long rejetes = rejetes;
+            public final long enCours = enCoursCount;
+            public final long termines = terminesCount;
+            public final long rejetes = rejetesCount;
         };
     }
     
@@ -237,6 +237,14 @@ public class CompleteWorkflowService {
                 .orElseThrow(() -> new RuntimeException("Type de document non trouvé"));
         
         return processStepRepository.findByDocumentTypeIdOrderByOrdre(docType.getId());
+    }
+    
+    /**
+     * Get admin user by ID
+     */
+    public AdminUser getAdminUserById(UUID userId) {
+        return adminUserRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
     }
 }
 

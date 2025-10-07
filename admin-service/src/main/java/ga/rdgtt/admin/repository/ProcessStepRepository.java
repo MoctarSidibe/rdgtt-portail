@@ -15,4 +15,6 @@ public interface ProcessStepRepository extends JpaRepository<ProcessStep, UUID> 
     List<ProcessStep> findByDocumentTypeIdAndActifTrueOrderByOrdreAsc(UUID documentTypeId);
     
     List<ProcessStep> findByActifTrue();
+    
+    List<ProcessStep> findByDocumentTypeIdOrderByOrdre(UUID documentTypeId);
 }

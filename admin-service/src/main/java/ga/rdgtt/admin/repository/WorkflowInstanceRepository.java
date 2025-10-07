@@ -24,4 +24,10 @@ public interface WorkflowInstanceRepository extends JpaRepository<WorkflowInstan
     
     @Query("SELECT w FROM WorkflowInstance w WHERE w.statut IN ('EN_ATTENTE', 'EN_COURS') AND w.bureauActuelId = :bureauId")
     List<WorkflowInstance> findPendingWorkflowsForBureau(@Param("bureauId") UUID bureauId);
+    
+    List<WorkflowInstance> findByDocumentTypeId(UUID documentTypeId);
+    
+    long countByStatut(String statut);
+    
+    List<WorkflowInstance> findByUtilisateurActuelId(UUID utilisateurId);
 }
