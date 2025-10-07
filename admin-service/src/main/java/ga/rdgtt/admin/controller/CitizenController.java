@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -25,11 +26,13 @@ public class CitizenController {
     public ResponseEntity<Map<String, Object>> getDemandeStatus(@PathVariable String demandeNumber) {
         try {
             // Rechercher l'instance de workflow par numéro de demande
-            WorkflowInstance workflow = workflowService.getWorkflowByDemandeNumber(demandeNumber);
+            Optional<WorkflowInstance> workflowOpt = workflowService.getWorkflowByDemandeNumber(demandeNumber);
             
-            if (workflow == null) {
+            if (workflowOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
+            
+            WorkflowInstance workflow = workflowOpt.get();
 
             // Construire la réponse avec les informations de statut
             Map<String, Object> response = new HashMap<>();
@@ -69,11 +72,13 @@ public class CitizenController {
     public ResponseEntity<Map<String, Object>> getDemandeHistory(@PathVariable String demandeNumber) {
         try {
             // Rechercher l'instance de workflow par numéro de demande
-            WorkflowInstance workflow = workflowService.getWorkflowByDemandeNumber(demandeNumber);
+            Optional<WorkflowInstance> workflowOpt = workflowService.getWorkflowByDemandeNumber(demandeNumber);
             
-            if (workflow == null) {
+            if (workflowOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
+            
+            WorkflowInstance workflow = workflowOpt.get();
 
             // Récupérer l'historique des étapes
             var history = workflowService.getWorkflowHistory(workflow.getId());
