@@ -57,8 +57,6 @@ public class ApplicationService {
         application.setDocumentTypeId(documentTypeId);
         application.setNumeroDemande(numeroDemande);
         application.setStatutId(initialStatus.getId());
-        application.setMontantTotal(documentType.getPrix());
-        application.setMontantPaye(0.0);
         application.setDateDepot(LocalDateTime.now());
         application.setDelaiEstimeJours(documentType.getDelaiTraitementJours());
         application.setDonneesDemande(applicationData.toString()); // JSON string
@@ -144,12 +142,6 @@ public class ApplicationService {
         return userApplicationRepository.findByStatutCodeOrderByCreatedAtDesc(statusCode);
     }
 
-    /**
-     * Obtenir les demandes en attente de paiement
-     */
-    public List<UserApplication> getApplicationsPendingPayment() {
-        return getApplicationsByStatus("EN_ATTENTE_PAIEMENT");
-    }
 
     /**
      * Obtenir les demandes avec documents manquants
@@ -158,27 +150,6 @@ public class ApplicationService {
         return getApplicationsByStatus("DOCUMENTS_MANQUANTS");
     }
 
-    /**
-     * Marquer une demande comme payée
-     */
-    public void markAsPaid(UUID applicationId, Double amount, String paymentReference) {
-        UserApplication application = getApplicationById(applicationId);
-        
-        application.setMontantPaye(amount);
-        application.setUpdatedAt(LocalDateTime.now());
-
-        // Si le montant payé correspond au montant total, passer au statut suivant
-        if (amount >= application.getMontantTotal()) {
-            updateApplicationStatus(applicationId, "EN_COURS", 
-                "Paiement reçu: " + paymentReference, null);
-        }
-
-        userApplicationRepository.save(application);
-
-        // Envoyer une notification
-        notificationService.notifyPaiementRecu(application.getUserId(), 
-            application.getNumeroDemande(), amount);
-    }
 
     /**
      * Annuler une demande

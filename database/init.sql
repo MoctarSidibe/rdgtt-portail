@@ -1,5 +1,5 @@
--- R-DGTT Portail Database Initialization
--- Clean, comprehensive setup for all services
+-- R-DGTT Hybrid Database Initialization
+-- Admin management + Citizen status checking (no user registration)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -10,18 +10,20 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- GRANT ALL PRIVILEGES ON DATABASE rdgtt_portail TO rdgtt_user;
 
 -- ==============================================
--- USAGER SERVICE TABLES
+-- ADMIN USERS (Internal Staff Only)
 -- ==============================================
 
--- Users table
-CREATE TABLE users (
+-- Admin users table (internal staff only)
+CREATE TABLE admin_users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nom VARCHAR(100) NOT NULL,
     prenom VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     telephone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(50) NOT NULL DEFAULT 'CITOYEN',
+    role VARCHAR(50) NOT NULL DEFAULT 'ADMIN', -- ADMIN, CHEF_SERVICE, AGENT
+    departement_id UUID,
+    bureau_id UUID,
     actif BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -144,8 +146,6 @@ CREATE TABLE document_types (
     categorie VARCHAR(100),
     actif BOOLEAN DEFAULT true,
     delai_traitement_jours INTEGER,
-    frais_obligatoire BOOLEAN DEFAULT false,
-    montant_frais DECIMAL(10,2),
     documents_requis TEXT,
     conditions_eligibilite TEXT,
     workflow_config TEXT,
@@ -285,13 +285,13 @@ INSERT INTO auto_ecoles (nom, code, adresse, telephone, email, statut) VALUES
 ('Auto-École Pro', 'AE002', 'Libreville, Quartier Glass', '+241 01 23 45 68', 'pro@autoecole.ga', 'VALIDE');
 
 -- Insert sample document types
-INSERT INTO document_types (nom, code, service_code, categorie, delai_traitement_jours, frais_obligatoire, montant_frais) VALUES
-('Permis de Conduire', 'PERMIS_CONDUIRE', 'permis', 'principal', 30, true, 15000),
-('Duplicata Permis de Conduire', 'DUPLICATA_PERMIS', 'permis', 'connexe', 15, true, 5000),
-('Renouvellement Permis de Conduire', 'RENOUVELLEMENT_PERMIS', 'permis', 'connexe', 20, true, 10000),
-('Carte Grise', 'CARTE_GRISE', 'carte-grise', 'principal', 7, true, 25000),
-('Duplicata Carte Grise', 'DUPLICATA_CARTE_GRISE', 'carte-grise', 'connexe', 5, true, 8000),
-('Licence de Transport', 'LICENCE_TRANSPORT', 'transport', 'principal', 45, true, 50000);
+INSERT INTO document_types (nom, code, service_code, categorie, delai_traitement_jours) VALUES
+('Permis de Conduire', 'PERMIS_CONDUIRE', 'permis', 'principal', 30),
+('Duplicata Permis de Conduire', 'DUPLICATA_PERMIS', 'permis', 'connexe', 15),
+('Renouvellement Permis de Conduire', 'RENOUVELLEMENT_PERMIS', 'permis', 'connexe', 20),
+('Carte Grise', 'CARTE_GRISE', 'carte-grise', 'principal', 7),
+('Duplicata Carte Grise', 'DUPLICATA_CARTE_GRISE', 'carte-grise', 'connexe', 5),
+('Licence de Transport', 'LICENCE_TRANSPORT', 'transport', 'principal', 45);
 
 -- Insert sample process steps for Permis de Conduire
 INSERT INTO process_steps (document_type_id, nom, code, ordre, role_requis, type_validation, delai_max_jours, obligatoire) 
@@ -342,36 +342,6 @@ CREATE TABLE user_notifications (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Payment methods
-CREATE TABLE payment_methods (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code VARCHAR(50) UNIQUE NOT NULL,
-    nom VARCHAR(255) NOT NULL,
-    description TEXT,
-    actif BOOLEAN DEFAULT true,
-    frais_pourcentage DECIMAL(5,2) DEFAULT 0.00,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Payment transactions
-CREATE TABLE payments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES users(id),
-    application_id UUID,
-    demande_id VARCHAR(255) NOT NULL,
-    document_type_id UUID REFERENCES document_types(id),
-    montant DECIMAL(10,2) NOT NULL,
-    devise VARCHAR(3) DEFAULT 'XAF',
-    payment_method_id UUID REFERENCES payment_methods(id),
-    statut VARCHAR(50) DEFAULT 'EN_ATTENTE',
-    reference_paiement VARCHAR(255),
-    reference_externe VARCHAR(255),
-    date_paiement TIMESTAMP,
-    date_expiration TIMESTAMP,
-    donnees_paiement TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- Document categories
 CREATE TABLE document_categories (
@@ -424,8 +394,6 @@ CREATE TABLE user_applications (
     numero_demande VARCHAR(50) UNIQUE NOT NULL,
     statut_id UUID REFERENCES application_statuses(id),
     workflow_instance_id UUID REFERENCES workflow_instances(id),
-    montant_total DECIMAL(10,2),
-    montant_paye DECIMAL(10,2) DEFAULT 0.00,
     date_depot TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_traitement TIMESTAMP,
     date_fin TIMESTAMP,
@@ -470,10 +438,6 @@ CREATE INDEX idx_user_notifications_user ON user_notifications(user_id);
 CREATE INDEX idx_user_notifications_lu ON user_notifications(lu);
 CREATE INDEX idx_user_notifications_created ON user_notifications(created_at);
 
--- Payments indexes
-CREATE INDEX idx_payments_user ON payments(user_id);
-CREATE INDEX idx_payments_demande ON payments(demande_id);
-CREATE INDEX idx_payments_statut ON payments(statut);
 
 -- Documents indexes
 CREATE INDEX idx_user_documents_user ON user_documents(user_id);
@@ -494,16 +458,9 @@ INSERT INTO notification_types (code, nom, description, template_subject, templa
 ('DEMANDE_DEPOSEE', 'Demande déposée', 'Notification quand une demande est déposée', 'Demande déposée - R-DGTT', 'Votre demande {{numero_demande}} a été déposée avec succès.'),
 ('DOCUMENT_VALIDE', 'Document validé', 'Notification quand un document est validé', 'Document validé - R-DGTT', 'Votre document {{nom_document}} a été validé.'),
 ('DOCUMENT_REJETE', 'Document rejeté', 'Notification quand un document est rejeté', 'Document rejeté - R-DGTT', 'Votre document {{nom_document}} a été rejeté. Motif: {{motif}}'),
-('PAIEMENT_RECU', 'Paiement reçu', 'Notification quand un paiement est reçu', 'Paiement reçu - R-DGTT', 'Votre paiement de {{montant}} XAF a été reçu.'),
 ('STATUT_CHANGE', 'Changement de statut', 'Notification de changement de statut', 'Statut mis à jour - R-DGTT', 'Le statut de votre demande {{numero_demande}} est maintenant: {{nouveau_statut}}'),
 ('RAPPEL_DOCUMENT', 'Rappel document', 'Rappel pour document manquant', 'Document manquant - R-DGTT', 'Il manque des documents pour votre demande {{numero_demande}}.');
 
--- Insert payment methods
-INSERT INTO payment_methods (code, nom, description, frais_pourcentage) VALUES
-('MOBILE_MONEY', 'Mobile Money', 'Paiement par Mobile Money', 1.50),
-('CARTE_BANCAIRE', 'Carte Bancaire', 'Paiement par carte bancaire', 2.00),
-('VIREMENT', 'Virement Bancaire', 'Virement bancaire', 0.00),
-('ESPECES', 'Espèces', 'Paiement en espèces', 0.00);
 
 -- Insert document categories
 INSERT INTO document_categories (code, nom, description, obligatoire) VALUES
@@ -519,7 +476,6 @@ INSERT INTO application_statuses (code, nom, description, couleur, ordre) VALUES
 ('DEPOSEE', 'Déposée', 'Demande déposée et en attente de traitement', '#007bff', 1),
 ('EN_COURS', 'En cours', 'Demande en cours de traitement', '#ffc107', 2),
 ('DOCUMENTS_MANQUANTS', 'Documents manquants', 'Des documents sont manquants', '#fd7e14', 3),
-('EN_ATTENTE_PAIEMENT', 'En attente de paiement', 'En attente du paiement des frais', '#dc3545', 4),
 ('VALIDATION', 'En validation', 'Demande en cours de validation', '#6f42c1', 5),
 ('VALIDE', 'Validée', 'Demande validée et approuvée', '#28a745', 6),
 ('REJETEE', 'Rejetée', 'Demande rejetée', '#dc3545', 7),
@@ -540,10 +496,10 @@ BEGIN
     RAISE NOTICE 'R-DGTT Portail Database Initialized Successfully!';
     RAISE NOTICE '==============================================';
     RAISE NOTICE 'Tables created: users, departments, bureaus, auto_ecoles, candidats, permis, document_types, process_steps, workflow_instances, workflow_step_executions';
-    RAISE NOTICE 'User Interface tables: notification_types, user_notifications, payment_methods, payments, document_categories, user_documents, application_statuses, user_applications, application_history, user_preferences';
-    RAISE NOTICE 'Sample data inserted: admin user, departments, bureaus, auto-écoles, document types, process steps, notification types, payment methods, document categories, application statuses';
+    RAISE NOTICE 'User Interface tables: notification_types, user_notifications, document_categories, user_documents, application_statuses, user_applications, application_history, user_preferences';
+    RAISE NOTICE 'Sample data inserted: admin user, departments, bureaus, auto-écoles, document types, process steps, notification types, document categories, application statuses';
     RAISE NOTICE 'Default admin: admin@rdgtt.ga / admin123';
-    RAISE NOTICE 'Features: In-app notifications, payment tracking, document management, application tracking';
+    RAISE NOTICE 'Features: In-app notifications, document management, application tracking';
     RAISE NOTICE 'Cost savings: SMS notifications disabled by default';
     RAISE NOTICE '==============================================';
 END $$;

@@ -30,11 +30,6 @@ public class UserApplication {
     @Column(name = "workflow_instance_id")
     private UUID workflowInstanceId;
     
-    @Column(name = "montant_total")
-    private Double montantTotal;
-    
-    @Column(name = "montant_paye")
-    private Double montantPaye = 0.0;
     
     @Column(name = "date_depot")
     private LocalDateTime dateDepot;
@@ -93,11 +88,6 @@ public class UserApplication {
     public UUID getWorkflowInstanceId() { return workflowInstanceId; }
     public void setWorkflowInstanceId(UUID workflowInstanceId) { this.workflowInstanceId = workflowInstanceId; }
     
-    public Double getMontantTotal() { return montantTotal; }
-    public void setMontantTotal(Double montantTotal) { this.montantTotal = montantTotal; }
-    
-    public Double getMontantPaye() { return montantPaye; }
-    public void setMontantPaye(Double montantPaye) { this.montantPaye = montantPaye; }
     
     public LocalDateTime getDateDepot() { return dateDepot; }
     public void setDateDepot(LocalDateTime dateDepot) { this.dateDepot = dateDepot; }

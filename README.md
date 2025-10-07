@@ -1,156 +1,192 @@
-# R-DGTT Portail - Système de Gestion des Transports Terrestres
+# 🚗 R-DGTT Portail - Système de Gestion des Transports
 
-## 🎯 **Système de Gestion Gouvernementale avec Configuration Métier**
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-blue.svg)](https://www.postgresql.org/)
 
-Système complet de gestion des transports terrestres pour le Ministère des Transports du Gabon, permettant aux **administrateurs système de gérer facilement tous les processus métier sans modification du code backend**.
+## 📋 Table des Matières
 
-## 🏗️ **Architecture du Système**
+- [Vue d'ensemble](#-vue-densemble)
+- [Architecture](#-architecture)
+- [Services](#-services)
+- [Workflow Métier](#-workflow-métier)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Déploiement](#-déploiement)
+- [API Documentation](#-api-documentation)
+- [Contribution](#-contribution)
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Traefik       │    │   Consul        │
-│   (React)       │◄───┤   (API Gateway) │◄───┤   (Discovery)   │
-│   Port 3000     │    │   Port 80       │    │   Port 8500     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                ┌───────────────┼───────────────┐
-                │               │               │
-        ┌───────▼───────┐ ┌─────▼─────┐ ┌──────▼──────┐
-        │ Usager Service│ │Auto-École │ │Permis Service│
-        │   Port 8081   │ │Port 8082  │ │  Port 8083  │
-        └───────────────┘ └───────────┘ └─────────────┘
-                │
-        ┌───────▼───────┐
-        │ Admin Service │
-        │   Port 8085   │
-        └───────────────┘
-                │
-        ┌───────▼───────┐
-        │  PostgreSQL   │
-        │   Port 5432   │
-        └───────────────┘
-```
+## 🎯 Vue d'ensemble
 
-## 🚀 **Services Inclus**
+Le **R-DGTT Portail** est une plateforme numérique complète pour la gestion des services de transport au Gabon. Le système combine une interface d'administration interne avec un portail citoyen pour le suivi des demandes.
 
-### **Core Services:**
-- ✅ **PostgreSQL** - Base de données centralisée
-- ✅ **Consul** - Découverte et configuration des services
-- ✅ **Traefik** - API Gateway et routage
-- ✅ **Usager Service** - Gestion des utilisateurs et authentification
-- ✅ **Auto-École Service** - Gestion des auto-écoles et candidats
-- ✅ **Permis Service** - Gestion des permis de conduire
-- ✅ **Admin Service** - Configuration métier et workflows
-- ✅ **Frontend** - Interface utilisateur React
+### ✨ Fonctionnalités Principales
 
-### **Deployment Ready:**
-- ✅ **Docker Compose** - Orchestration des services
-- ✅ **Docker Secrets** - Gestion sécurisée des mots de passe
-- ✅ **Hetzner Cloud** - Déploiement optimisé
-- ✅ **Scripts de déploiement** - Installation automatique
-- ✅ **Multi-stage Docker builds** - Optimisation des performances
-- ✅ **Maven dependency caching** - Builds plus rapides
+- 🏢 **Administration Interne** - Gestion complète des départements, bureaux et processus
+- 👥 **Portail Citoyen** - Suivi des demandes sans création de compte
+- 🔄 **Workflow Configurable** - Processus métier flexibles et adaptables
+- 🎭 **Gestion des Rôles** - Hiérarchie d'autorisation complète
+- 📊 **Tableaux de Bord** - Suivi en temps réel des processus
+- 🔐 **Sécurité** - Authentification et autorisation basées sur les rôles
 
-## 🎛️ **Système de Configuration Admin**
+## 🏗️ Architecture
 
-### **1. Gestion des Types de Documents**
-L'administrateur peut créer et configurer tous les types de documents :
+### Architecture Microservices
 
-```json
-{
-  "nom": "Permis de Conduire",
-  "code": "PERMIS_CONDUIRE",
-  "service_code": "permis",
-  "categorie": "principal",
-  "delai_traitement_jours": 30,
-  "frais_obligatoire": true,
-  "montant_frais": 15000,
-  "documents_requis": ["CNI", "Photo", "Certificat médical"],
-  "conditions_eligibilite": {"age_min": 18, "permis_valide": true}
-}
-```
-
-### **2. Gestion des Processus de Validation**
-Configuration du circuit de validation :
-
-```json
-{
-  "nom": "Validation par Chef de Service",
-  "code": "VALIDATION_CHEF",
-  "ordre": 3,
-  "departement_id": "uuid-departement",
-  "role_requis": "DC",
-  "type_validation": "manuelle",
-  "delai_max_jours": 3,
-  "peut_rejeter": true,
-  "peut_rediriger": false
-}
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        FE[Frontend React]
+    end
+    
+    subgraph "API Gateway"
+        T[Traefik]
+    end
+    
+    subgraph "Service Discovery"
+        C[Consul]
+    end
+    
+    subgraph "Microservices"
+        AS[Admin Service<br/>Workflow & Roles]
+        AES[Auto-École Service<br/>Driving Schools]
+        PS[Permis Service<br/>Driving Permits]
+    end
+    
+    subgraph "Data Layer"
+        DB[(PostgreSQL<br/>Database)]
+    end
+    
+    FE --> T
+    T --> C
+    C --> AS
+    C --> AES
+    C --> PS
+    AS --> DB
+    AES --> DB
+    PS --> DB
 ```
 
-### **3. Moteur de Workflow Métier**
-Le système utilise un moteur de workflow configurable qui permet de :
+### Hiérarchie des Rôles
 
-#### **Configuration Dynamique des Processus:**
-- ✅ **Types de Documents**: Création et modification sans redéploiement
-- ✅ **Étapes de Validation**: Configuration des circuits d'approbation
-- ✅ **Règles Métier**: Définition des conditions et critères
-- ✅ **Statuts Personnalisés**: Création de nouveaux statuts selon les besoins
-- ✅ **Transitions Automatiques**: Passage automatique entre étapes
-
-#### **Exemple de Configuration Workflow:**
-```json
-{
-  "workflow_name": "Permis de Conduire",
-  "document_type": "PERMIS_CONDUIRE",
-  "steps": [
-    {
-      "step_name": "Dépôt de la demande",
-      "step_code": "DEPOT",
-      "order": 1,
-      "auto_approve": true,
-      "next_step": "VERIFICATION_DOCUMENTS"
-    },
-    {
-      "step_name": "Vérification des documents",
-      "step_code": "VERIFICATION_DOCUMENTS",
-      "order": 2,
-      "required_role": "DC",
-      "department": "Direction des Contrôles",
-      "next_step": "VALIDATION_CHEF"
-    },
-    {
-      "step_name": "Validation par le chef de service",
-      "step_code": "VALIDATION_CHEF",
-      "order": 3,
-      "required_role": "CHEF_SERVICE",
-      "next_step": "APPROBATION_FINALE"
-    }
-  ]
-}
+```mermaid
+graph TD
+    DGTT[DGTT<br/>Directeur Général<br/>Level 5] --> DIR[DIRECTEUR<br/>Directeur<br/>Level 4]
+    DIR --> CS[CHEF_SERVICE<br/>Chef de Service<br/>Level 3]
+    CS --> CB[CHEF_BUREAU<br/>Chef de Bureau<br/>Level 2]
+    CB --> AG[AGENT<br/>Agent<br/>Level 1]
+    
+    DGTT -.->|"Peut gérer tous"| DIR
+    DIR -.->|"Peut gérer départements"| CS
+    CS -.->|"Peut créer workflows"| CB
+    CB -.->|"Peut gérer bureau"| AG
 ```
 
-#### **Fonctionnalités Avancées:**
-- 🔄 **Exécution automatique** des processus
-- ⏰ **Gestion des délais** et escalations
-- 📋 **Suivi de l'historique** complet
-- 🔀 **Redirections et rejets** configurables
-- 🔔 **Notifications automatiques** à chaque étape
-- 🎯 **Règles conditionnelles** basées sur les données
-- 📊 **Tableaux de bord** de suivi en temps réel
+## 🔧 Services
 
-## 🛠️ **Installation et Démarrage**
+### 1. Admin Service (Port: 8081)
+**Responsabilités:**
+- Gestion des utilisateurs et rôles
+- Configuration des workflows
+- Gestion des départements et bureaux
+- Moteur de workflow métier
+- Portail citoyen (suivi des demandes)
 
-### **Prérequis**
-- Java 17+
-- Maven 3.8+
-- Node.js 18+
-- PostgreSQL 13+
-- Consul
-- Traefik
+**Endpoints principaux:**
+- `/api/admin/*` - Gestion administrative
+- `/api/workflow/*` - Gestion des workflows
+- `/api/citizen/*` - Portail citoyen
 
-### **1. Configuration de la Base de Données**
+### 2. Auto-École Service (Port: 8082)
+**Responsabilités:**
+- Gestion des auto-écoles
+- Inscription des candidats
+- Suivi de formation
+- Gestion des examens
 
-#### **Option A: Avec l'utilisateur par défaut (Recommandé)**
+### 3. Permis Service (Port: 8083)
+**Responsabilités:**
+- Gestion des permis de conduire
+- Traitement des demandes
+- Génération des documents
+
+### 4. Frontend (Port: 80)
+**Responsabilités:**
+- Interface d'administration
+- Portail citoyen
+- Tableaux de bord
+
+## 🔄 Workflow Métier
+
+### Processus Complet: Auto-École → Candidat → Permis
+
+```mermaid
+flowchart TD
+    subgraph "Phase 1: Auto-École"
+        AE1[Inscription Auto-École] --> AE2[Vérification Documents]
+        AE2 --> AE3[Inspection Locaux]
+        AE3 --> AE4[Validation Directeur]
+        AE4 --> AE5[Approbation DGTT]
+    end
+    
+    subgraph "Phase 2: Candidat"
+        C1[Inscription Candidat] --> C2[Vérification Documents]
+        C2 --> C3[Validation Chef Service]
+        C3 --> C4[Génération Dossier]
+    end
+    
+    subgraph "Phase 3: Permis"
+        P1[Réception Demande] --> P2[Vérification Dossier]
+        P2 --> P3[Validation Examens]
+        P3 --> P4[Contrôle Directeur]
+        P4 --> P5[Approbation DGTT]
+        P5 --> P6[Génération Permis]
+    end
+    
+    AE5 --> C1
+    C4 --> P1
+```
+
+### Services Connexes
+
+```mermaid
+graph LR
+    subgraph "Services Connexes"
+        DUP[Duplicata Permis<br/>7 jours]
+        REN[Renouvellement<br/>15 jours]
+        CONV[Conversion Étranger<br/>20 jours]
+        ATT[Attestation<br/>3 jours]
+    end
+    
+    P6 --> DUP
+    P6 --> REN
+    P6 --> CONV
+    P6 --> ATT
+```
+
+## 🚀 Installation
+
+### Prérequis
+
+- **Java 17+**
+- **Maven 3.8+**
+- **Node.js 18+**
+- **PostgreSQL 13+**
+- **Docker & Docker Compose**
+- **Consul**
+- **Traefik**
+
+### 1. Cloner le Repository
+
+```bash
+git clone https://github.com/MoctarSidibe/rdgtt-portail.git
+cd rdgtt-portail
+```
+
+### 2. Configuration de la Base de Données
+
 ```bash
 # Se connecter en tant que superutilisateur postgres
 psql -U postgres
@@ -161,288 +197,249 @@ CREATE USER rdgtt_user WITH PASSWORD 'rdgtt_password_2025';
 GRANT ALL PRIVILEGES ON DATABASE rdgtt_portail TO rdgtt_user;
 \q
 
-# Initialiser le schéma complet avec les données
+# Initialiser le schéma complet
 psql -U postgres -d rdgtt_portail -f database/init.sql
+psql -U postgres -d rdgtt_portail -f complete-workflow-metier.sql
 ```
 
-#### **Option B: Avec l'utilisateur créé**
+### 3. Configuration des Variables d'Environnement
+
 ```bash
-# Si vous avez déjà créé l'utilisateur rdgtt_user
+cp env.example .env
+# Éditer .env avec vos configurations
+```
+
+### 4. Démarrage des Services
+
+```bash
+# Démarrer tous les services
+docker compose up -d
+
+# Vérifier le statut
+docker compose ps
+```
+
+## ⚙️ Configuration
+
+### Variables d'Environnement
+
+```bash
+# Database
+POSTGRES_DB=rdgtt_portail
+POSTGRES_USER=rdgtt_user
+POSTGRES_PASSWORD=rdgtt_password_2025
+
+# Services
+ADMIN_SERVICE_PORT=8081
+AUTO_ECOLE_SERVICE_PORT=8082
+PERMIS_SERVICE_PORT=8083
+FRONTEND_PORT=80
+
+# Consul
+CONSUL_HOST=consul
+CONSUL_PORT=8500
+
+# Traefik
+TRAEFIK_DASHBOARD_PORT=8080
+```
+
+### Configuration des Workflows
+
+Les workflows sont configurables via l'interface d'administration:
+
+1. **Types de Documents** - Définir les processus métier
+2. **Étapes de Validation** - Configurer les circuits d'approbation
+3. **Rôles et Permissions** - Assigner les responsabilités
+4. **Délais et Escalations** - Gérer les contraintes temporelles
+
+## 🚀 Déploiement
+
+### Déploiement Local
+
+```bash
+# Build et démarrage
+docker compose build --no-cache
+docker compose up -d
+
+# Logs
+docker compose logs -f
+```
+
+### Déploiement Production
+
+```bash
+# Utiliser le script de déploiement
+./deploy-hetzner.sh
+
+# Ou déploiement manuel
+docker compose -f docker-compose.yml up -d
+```
+
+### Vérification du Déploiement
+
+```bash
+# Vérifier les services
+curl http://localhost:8081/actuator/health  # Admin Service
+curl http://localhost:8082/actuator/health  # Auto-École Service
+curl http://localhost:8083/actuator/health  # Permis Service
+
+# Vérifier l'interface
+curl http://localhost/  # Frontend
+```
+
+## 📚 API Documentation
+
+### Authentification
+
+```bash
+# Login Admin
+POST /api/auth/login
+{
+  "email": "dgtt@rdgtt.ga",
+  "password": "admin123"
+}
+```
+
+### Workflow Management
+
+```bash
+# Démarrer un workflow Auto-École
+POST /api/workflow/auto-ecole/start
+{
+  "autoEcoleName": "Auto-École Excellence",
+  "demandeId": "AE-2024-001",
+  "userId": "uuid"
+}
+
+# Exécuter une étape
+POST /api/workflow/execute
+{
+  "workflowId": "uuid",
+  "stepId": "uuid",
+  "decision": "APPROUVE",
+  "commentaires": "Documents conformes",
+  "userId": "uuid"
+}
+```
+
+### Portail Citoyen
+
+```bash
+# Vérifier le statut d'une demande
+GET /api/citizen/status/{demandeNumber}
+
+# Exemple de réponse
+{
+  "numero_demande": "PERMIS-2024-001",
+  "statut": "EN_COURS",
+  "date_depot": "2024-01-15T10:30:00",
+  "document_type": {
+    "nom": "Permis de Conduire",
+    "code": "PERMIS_CONDUIRE"
+  },
+  "delai_estime_jours": 30
+}
+```
+
+## 🎯 Utilisateurs par Défaut
+
+### Comptes Administrateurs
+
+| Rôle | Email | Mot de passe | Permissions |
+|------|-------|--------------|-------------|
+| **DGTT** | `dgtt@rdgtt.ga` | `admin123` | Contrôle total du système |
+| **CHEF_SERVICE** | `admin@rdgtt.ga` | `admin123` | Gestion des workflows et utilisateurs |
+
+### Données de Test
+
+| Type | Numéro | Description |
+|------|--------|-------------|
+| **Auto-École** | `AE-2024-001` | Inscription Auto-École Excellence |
+| **Candidat** | `CAND-2024-001` | Inscription candidat Jean Dupont |
+| **Permis** | `PERMIS-2024-001` | Demande permis candidat Jean Dupont |
+| **Duplicata** | `DUP-2024-001` | Demande duplicata permis perdu |
+
+## 🔧 Développement
+
+### Structure du Projet
+
+```
+rdgtt-portail/
+├── admin-service/          # Service d'administration
+├── auto-ecole-service/     # Service auto-écoles
+├── permis-service/         # Service permis
+├── frontend/               # Interface React
+├── database/               # Scripts de base de données
+├── consul-config/          # Configuration Consul
+├── traefik-config/         # Configuration Traefik
+└── docker-compose.yml      # Orchestration Docker
+```
+
+### Commandes de Développement
+
+```bash
+# Build des services
+mvn clean package -DskipTests
+
+# Tests
+mvn test
+
+# Frontend
+cd frontend
+npm install
+npm start
+
+# Base de données
 psql -U rdgtt_user -d rdgtt_portail -f database/init.sql
 ```
 
-#### **Vérification de l'installation:**
-```bash
-# Vérifier que les tables ont été créées
-psql -U postgres -d rdgtt_portail -c "\dt"
+## 📊 Monitoring
 
-# Vérifier les données d'exemple
-psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM users;"
-psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM document_types;"
-psql -U postgres -d rdgtt_portail -c "SELECT COUNT(*) FROM payment_methods;"
-```
+### Health Checks
 
-### **2. Démarrage des Services**
-```bash
-# Terminal 1 - Consul
-cd consul-config
-.\consul.exe agent -config-file consul.json -dev
+- **Admin Service**: `http://localhost:8081/actuator/health`
+- **Auto-École Service**: `http://localhost:8082/actuator/health`
+- **Permis Service**: `http://localhost:8083/actuator/health`
 
-# Terminal 2 - Traefik
-cd traefik-config
-.\traefik.exe --configfile=traefik-simple.yml
+### Consul Dashboard
 
-# Terminal 3 - Usager Service
-cd usager-service
-mvn spring-boot:run
+- **URL**: `http://localhost:8500`
+- **Services**: Vérification de l'enregistrement des services
 
-# Terminal 4 - Auto-École Service
-cd auto-ecole-service
-mvn spring-boot:run
+### Traefik Dashboard
 
-# Terminal 5 - Permis Service
-cd permis-service
-mvn spring-boot:run
+- **URL**: `http://localhost:8080`
+- **Routes**: Configuration et statut des routes
 
-# Terminal 6 - Admin Service
-cd admin-service
-mvn spring-boot:run
+## 🤝 Contribution
 
-# Terminal 7 - Frontend
-cd frontend
-npm start
-```
+### Guidelines
 
-## 🌐 **Accès aux Services**
+1. **Fork** le repository
+2. **Créer** une branche feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+5. **Ouvrir** une Pull Request
 
-- **R-DGTT Portail**: `http://localhost`
-- **Traefik Dashboard**: `http://localhost/traefik` (admin/admin123)
-- **Consul UI**: `http://localhost:8500`
-- **Admin API**: `http://localhost/api/admin`
+### Standards de Code
 
-## 🔑 **Connexion par Défaut**
+- **Java**: Suivre les conventions Spring Boot
+- **React**: Utiliser les hooks et composants fonctionnels
+- **SQL**: Respecter les conventions de nommage
+- **Documentation**: Maintenir la documentation à jour
 
-- **Email**: admin@rdgtt.ga
-- **Mot de passe**: admin123
-- **Rôle**: ADMIN
+## 📄 Licence
 
-## 📋 **Fonctionnalités Principales**
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-### **Pour les Citoyens:**
-- ✅ Inscription et connexion sécurisée
-- ✅ Demande de permis de conduire
-- ✅ Suivi en temps réel des demandes
-- ✅ Gestion des documents
-- ✅ Interface intuitive et responsive
-- ✅ **Tableau de bord personnalisé** avec suivi des applications
-- ✅ **Notifications in-app** pour les mises à jour
-- ✅ **Paiement Mobile Money** (Airtel Money simulé)
-- ✅ **Historique des paiements** et des transactions
+## 📞 Support
 
-### **Pour les Auto-Écoles:**
-- ✅ Gestion des candidats
-- ✅ Suivi des formations
-- ✅ Gestion des documents
-- ✅ Tableau de bord complet
+Pour toute question ou support:
 
-### **Pour les Administrateurs:**
-- ✅ **Configuration métier dynamique** sans redéploiement
-- ✅ **Types de documents personnalisés** avec règles spécifiques
-- ✅ **Processus de validation configurables** par type de document
-- ✅ **Workflows adaptatifs** selon les besoins métier
-- ✅ **Gestion des utilisateurs et rôles** avec permissions granulaires
-- ✅ **Configuration des départements et bureaux** hiérarchiques
-- ✅ **Monitoring des paiements** et transactions en temps réel
-- ✅ **Gestion des notifications** système personnalisables
-- ✅ **Statistiques détaillées** des utilisateurs et processus
-- ✅ **Interface d'administration** intuitive et complète
-
-## 🎯 **Avantages du Système**
-
-### **1. Flexibilité Métier**
-- ✅ Modification des processus sans code
-- ✅ Ajout de nouveaux types de documents
-- ✅ Configuration des délais et frais
-- ✅ Gestion des rôles et permissions
-
-### **2. Maintenance Simplifiée**
-- ✅ Architecture microservices modulaire
-- ✅ Configuration centralisée
-- ✅ Déploiement indépendant des services
-- ✅ Debugging facilité
-
-### **3. Évolutivité**
-- ✅ Ajout facile de nouveaux services
-- ✅ Workflow engine réutilisable
-- ✅ API standardisée
-- ✅ Scalabilité horizontale
-
-## 📚 **Structure du Projet**
-
-```
-r_dgtt/
-├── admin-service/        # Configuration métier et workflows
-├── auto-ecole-service/   # Gestion des auto-écoles
-├── consul-config/        # Configuration Consul
-├── database/             # Scripts de base de données
-├── frontend/             # Interface React
-├── permis-service/       # Gestion des permis
-├── traefik-config/       # Configuration Traefik
-└── usager-service/       # Gestion des utilisateurs
-```
-
-## 🔧 **Configuration Avancée**
-
-### **Types de Documents Supportés:**
-- Permis de Conduire
-- Duplicata Permis
-- Renouvellement Permis
-- Carte Grise
-- Duplicata Carte Grise
-- Licence de Transport
-- Attestation d'Authenticité
-
-### **Processus de Validation:**
-- Réception de la demande
-- Vérification des documents
-- Validation par les services
-- Approbation finale
-- Délivrance du document
-
-### **Rôles Utilisateur:**
-- **ADMIN** - Administration complète
-- **DGTT** - Direction Générale
-- **DC** - Direction des Contrôles
-- **SEV** - Service des Examens
-- **SAF** - Service des Affaires Financières
-- **CITOYEN** - Utilisateur final
-
-### **Système de Paiement Airtel Money:**
-- ✅ **Simulation complète** pour les tests
-- ✅ **Validation du numéro** gabonais (+241XXXXXXXX)
-- ✅ **Gestion des erreurs** (solde insuffisant, PIN incorrect, etc.)
-- ✅ **Notifications automatiques** de succès/échec
-- ✅ **Historique des transactions** avec références
-- ✅ **Interface utilisateur** intuitive
-- ✅ **Prêt pour l'intégration** API Airtel réelle
-
-## 🔧 **API Admin Service - Configuration Métier**
-
-### **Endpoints Principaux:**
-
-#### **Gestion des Types de Documents:**
-```bash
-# Créer un nouveau type de document
-POST /api/admin/document-types
-{
-  "nom": "Permis de Conduire",
-  "code": "PERMIS_CONDUIRE",
-  "service_code": "permis",
-  "categorie": "principal",
-  "delai_traitement_jours": 30,
-  "frais_obligatoire": true,
-  "montant_frais": 15000
-}
-
-# Lister tous les types de documents
-GET /api/admin/document-types
-
-# Modifier un type de document
-PUT /api/admin/document-types/{id}
-```
-
-#### **Gestion des Workflows:**
-```bash
-# Créer un workflow
-POST /api/admin/workflows
-{
-  "nom": "Workflow Permis de Conduire",
-  "document_type_id": "uuid",
-  "etapes": [...]
-}
-
-# Activer/Désactiver un workflow
-PUT /api/admin/workflows/{id}/status
-{
-  "actif": true
-}
-```
-
-#### **Gestion des Statuts:**
-```bash
-# Créer un nouveau statut
-POST /api/admin/application-statuses
-{
-  "nom": "En Attente de Paiement",
-  "code": "EN_ATTENTE_PAIEMENT",
-  "couleur": "#FFA500",
-  "description": "Demande en attente de paiement"
-}
-```
-
-## 🔐 **Sécurité - Variables d'Environnement**
-
-### **Gestion Sécurisée des Mots de Passe**
-Le système utilise des variables d'environnement pour une gestion sécurisée des données sensibles:
-
-```bash
-# Créer le fichier .env
-echo "POSTGRES_PASSWORD=rdgtt_password" > .env
-echo "DOMAIN=localhost" >> .env
-echo "ACME_EMAIL=admin@rdgtt.ga" >> .env
-echo "JWT_SECRET=rdgtt_jwt_secret_2025" >> .env
-echo "SPRING_PROFILES_ACTIVE=production" >> .env
-
-# Démarrer avec les variables d'environnement
-docker compose up -d
-```
-
-### **Avantages des Variables d'Environnement:**
-- ✅ **Configuration simple** - Facile à gérer et modifier
-- ✅ **Compatible** - Fonctionne avec tous les services
-- ✅ **Flexible** - Peut être différent par environnement
-- ✅ **Non commité dans Git** - Le fichier `.env` est dans `.gitignore`
-- ✅ **Déploiement rapide** - Pas de complexité supplémentaire
-
-Voir le guide complet: [DOCKER_SECRETS_SETUP.md](DOCKER_SECRETS_SETUP.md)
-
-## 🚀 **Déploiement en Production**
-
-### **Déploiement sur Hetzner Cloud (Recommandé):**
-- ✅ **Guide complet** - `DEPLOYMENT_HETZNER.md`
-- ✅ **Déploiement manuel** - Étape par étape pour l'apprentissage
-- ✅ **Docker Secrets** - Gestion sécurisée des mots de passe
-- ✅ **Workflow de développement** - Mise à jour GitHub → Serveur
-- ✅ **Optimisations Docker** - Multi-stage builds pour des déploiements rapides
-- ✅ **Coût optimisé** - €3.29/mois pour 2GB RAM
-
-### **Recommandations:**
-- Utiliser HTTPS avec certificats SSL
-- Configurer un reverse proxy (Nginx/Traefik)
-- Mettre en place des sauvegardes automatiques
-- Monitorer les performances et logs
-- Utiliser des variables d'environnement pour la configuration
-- Configurer la surveillance des services
-- Implémenter la haute disponibilité
-
-### **Sécurité:**
-- Authentification JWT
-- Chiffrement des données sensibles
-- Validation des entrées utilisateur
-- Audit des actions administratives
-- Protection contre les attaques courantes
-
-## 🎉 **Résultat**
-
-Un système **professionnel**, **configurable** et **maintenable** qui permet aux administrateurs DGTT de gérer facilement tous les processus métier sans intervention technique ! 
-
-**Développé pour le Ministère des Transports du Gabon** 🇬🇦✨
+- **Email**: contact@rdgtt.ga
+- **Téléphone**: +241 01 23 45 67
+- **Issues**: [GitHub Issues](https://github.com/MoctarSidibe/rdgtt-portail/issues)
 
 ---
 
-## 📞 **Support Technique**
-
-Pour toute question ou support technique, contactez l'équipe de développement.
-
-**Version**: 1.0.0  
-**Dernière mise à jour**: Janvier 2025
+**R-DGTT Portail** - Ministère des Transports, de la Marine Marchande et de la Logistique du Gabon 🇬🇦

@@ -143,12 +143,6 @@ public class NotificationService {
                    "motif", motif));
     }
 
-    public void notifyPaiementRecu(UUID userId, String numeroDemande, Double montant) {
-        createNotification(userId, "PAIEMENT_RECU",
-            "Paiement reçu - R-DGTT",
-            "Votre paiement de {{montant}} XAF pour la demande {{numero_demande}} a été reçu.",
-            Map.of("numero_demande", numeroDemande, "montant", montant.toString()));
-    }
 
     public void notifyRappelDocument(UUID userId, String numeroDemande, String documentsManquants) {
         createNotification(userId, "RAPPEL_DOCUMENT",

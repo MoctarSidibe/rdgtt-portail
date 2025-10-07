@@ -21,11 +21,6 @@ public class UserInterfaceController {
     @Autowired
     private NotificationService notificationService;
     
-    @Autowired
-    private PaymentService paymentService;
-    
-    @Autowired
-    private AirtelMoneySimulationService airtelMoneySimulationService;
 
     /**
      * Obtenir le tableau de bord d'un utilisateur
@@ -39,8 +34,6 @@ public class UserInterfaceController {
             // Récupérer les notifications non lues
             List<Notification> notifications = notificationService.getUnreadNotificationsByUserId(userId);
             
-            // Récupérer les paiements récents
-            List<Payment> payments = paymentService.getPaymentsByUserId(userId);
             
             // Statistiques
             Map<String, Long> applicationStats = applicationService.getApplicationStatistics();
@@ -48,7 +41,6 @@ public class UserInterfaceController {
             return ResponseEntity.ok(Map.of(
                 "applications", applications,
                 "notifications", notifications,
-                "payments", payments,
                 "statistics", applicationStats,
                 "unread_notifications_count", notifications.size()
             ));
@@ -125,98 +117,6 @@ public class UserInterfaceController {
         }
     }
 
-    /**
-     * Obtenir les paiements d'un utilisateur
-     */
-    @GetMapping("/payments/{userId}")
-    public ResponseEntity<List<Payment>> getUserPayments(@PathVariable UUID userId) {
-        try {
-            List<Payment> payments = paymentService.getPaymentsByUserId(userId);
-            return ResponseEntity.ok(payments);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    /**
-     * Simuler un paiement Airtel Money
-     */
-    @PostMapping("/airtel-money/simulate/{paymentId}")
-    public ResponseEntity<Map<String, Object>> simulateAirtelMoneyPayment(
-            @PathVariable UUID paymentId,
-            @RequestBody Map<String, String> paymentData) {
-        
-        try {
-            String phoneNumber = paymentData.get("phoneNumber");
-            String pin = paymentData.get("pin");
-            
-            if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Numéro de téléphone requis"
-                ));
-            }
-            
-            if (pin == null || pin.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "PIN requis"
-                ));
-            }
-            
-            Map<String, Object> result = airtelMoneySimulationService.simulateAirtelMoneyPayment(
-                paymentId, phoneNumber, pin
-            );
-            
-            return ResponseEntity.ok(result);
-            
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", e.getMessage()
-            ));
-        }
-    }
-
-    /**
-     * Obtenir les méthodes de paiement disponibles
-     */
-    @GetMapping("/payment-methods")
-    public ResponseEntity<List<PaymentMethod>> getAvailablePaymentMethods() {
-        try {
-            List<PaymentMethod> methods = paymentService.getAvailablePaymentMethods();
-            return ResponseEntity.ok(methods);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    /**
-     * Créer un nouveau paiement
-     */
-    @PostMapping("/payments/create")
-    public ResponseEntity<Map<String, Object>> createPayment(@RequestBody Map<String, Object> paymentData) {
-        try {
-            UUID userId = UUID.fromString((String) paymentData.get("userId"));
-            UUID applicationId = UUID.fromString((String) paymentData.get("applicationId"));
-            UUID paymentMethodId = UUID.fromString((String) paymentData.get("paymentMethodId"));
-            Double amount = Double.valueOf(paymentData.get("amount").toString());
-            
-            Payment payment = paymentService.createPayment(userId, applicationId, paymentMethodId, amount, paymentData);
-            
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "payment", payment,
-                "message", "Paiement créé avec succès"
-            ));
-            
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", e.getMessage()
-            ));
-        }
-    }
 
     /**
      * Obtenir les statistiques d'un utilisateur
@@ -225,7 +125,6 @@ public class UserInterfaceController {
     public ResponseEntity<Map<String, Object>> getUserStatistics(@PathVariable UUID userId) {
         try {
             List<UserApplication> applications = applicationService.getUserApplications(userId);
-            List<Payment> payments = paymentService.getPaymentsByUserId(userId);
             List<Notification> notifications = notificationService.getNotificationsByUserId(userId);
             
             long totalApplications = applications.size();
@@ -234,11 +133,6 @@ public class UserInterfaceController {
                 .count();
             long completedApplications = applications.stream()
                 .filter(app -> "TERMINEE".equals(app.getStatut().getCode()))
-                .count();
-            
-            long totalPayments = payments.size();
-            long successfulPayments = payments.stream()
-                .filter(payment -> "VALIDE".equals(payment.getStatut()))
                 .count();
             
             long unreadNotifications = notifications.stream()
@@ -250,10 +144,6 @@ public class UserInterfaceController {
                     "total", totalApplications,
                     "pending", pendingApplications,
                     "completed", completedApplications
-                ),
-                "payments", Map.of(
-                    "total", totalPayments,
-                    "successful", successfulPayments
                 ),
                 "notifications", Map.of(
                     "total", notifications.size(),

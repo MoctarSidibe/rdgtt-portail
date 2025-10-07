@@ -13,6 +13,7 @@ import AutoEcoles from './pages/AutoEcoles';
 import Candidats from './pages/Candidats';
 import Permis from './pages/Permis';
 import Profile from './pages/Profile';
+import CitizenStatusCheck from './components/CitizenStatusCheck';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -32,6 +33,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/citizen/status" element={<CitizenStatusCheck />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );

@@ -39,11 +39,6 @@ public class DocumentType {
     @Column(name = "delai_traitement_jours")
     private Integer delaiTraitementJours;
     
-    @Column(name = "frais_obligatoire")
-    private Boolean fraisObligatoire = false;
-    
-    @Column(name = "montant_frais")
-    private Double montantFrais;
     
     @Column(name = "documents_requis", columnDefinition = "TEXT")
     private String documentsRequis; // JSON array of required documents
@@ -99,11 +94,6 @@ public class DocumentType {
     public Integer getDelaiTraitementJours() { return delaiTraitementJours; }
     public void setDelaiTraitementJours(Integer delaiTraitementJours) { this.delaiTraitementJours = delaiTraitementJours; }
     
-    public Boolean getFraisObligatoire() { return fraisObligatoire; }
-    public void setFraisObligatoire(Boolean fraisObligatoire) { this.fraisObligatoire = fraisObligatoire; }
-    
-    public Double getMontantFrais() { return montantFrais; }
-    public void setMontantFrais(Double montantFrais) { this.montantFrais = montantFrais; }
     
     public String getDocumentsRequis() { return documentsRequis; }
     public void setDocumentsRequis(String documentsRequis) { this.documentsRequis = documentsRequis; }
