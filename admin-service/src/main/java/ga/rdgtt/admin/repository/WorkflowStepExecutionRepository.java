@@ -19,4 +19,6 @@ public interface WorkflowStepExecutionRepository extends JpaRepository<WorkflowS
     List<WorkflowStepExecution> findByDepartementId(UUID departementId);
     
     List<WorkflowStepExecution> findByBureauId(UUID bureauId);
+    
+    List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByDateDebut(UUID workflowInstanceId);
 }

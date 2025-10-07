@@ -1,7 +1,9 @@
 package ga.rdgtt.admin.service;
 
 import ga.rdgtt.admin.model.WorkflowInstance;
+import ga.rdgtt.admin.model.WorkflowStepExecution;
 import ga.rdgtt.admin.repository.WorkflowInstanceRepository;
+import ga.rdgtt.admin.repository.WorkflowStepExecutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,9 @@ public class WorkflowService {
 
     @Autowired
     private WorkflowInstanceRepository workflowInstanceRepository;
+    
+    @Autowired
+    private WorkflowStepExecutionRepository workflowStepExecutionRepository;
 
     public List<WorkflowInstance> getAllWorkflows() {
         return workflowInstanceRepository.findAll();
@@ -24,7 +29,8 @@ public class WorkflowService {
     }
 
     public Optional<WorkflowInstance> getWorkflowByDemandeId(String demandeId) {
-        return workflowInstanceRepository.findByDemandeId(demandeId);
+        List<WorkflowInstance> workflows = workflowInstanceRepository.findByDemandeId(demandeId);
+        return workflows.isEmpty() ? Optional.empty() : Optional.of(workflows.get(0));
     }
 
     public List<WorkflowInstance> getWorkflowsByStatus(String status) {
@@ -49,5 +55,9 @@ public class WorkflowService {
 
     public List<WorkflowInstance> getWorkflowsByDocumentType(UUID documentTypeId) {
         return workflowInstanceRepository.findByDocumentTypeId(documentTypeId);
+    }
+    
+    public List<WorkflowStepExecution> getWorkflowHistory(UUID workflowId) {
+        return workflowStepExecutionRepository.findByWorkflowInstanceIdOrderByDateDebut(workflowId);
     }
 }

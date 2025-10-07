@@ -30,4 +30,8 @@ public interface WorkflowInstanceRepository extends JpaRepository<WorkflowInstan
     long countByStatut(String statut);
     
     List<WorkflowInstance> findByUtilisateurActuelId(UUID utilisateurId);
+    
+    List<WorkflowInstance> findByDepartementActuelId(UUID departementId);
+    
+    List<WorkflowInstance> findByBureauActuelId(UUID bureauId);
 }

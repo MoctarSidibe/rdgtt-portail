@@ -86,8 +86,7 @@ public class Candidat {
     @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Examen> examens;
     
-    @OneToMany(mappedBy = "candidat", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Paiement> paiements;
+    // Paiements removed - no payment system
     
     // Constructors
     public Candidat() {}
@@ -256,13 +255,7 @@ public class Candidat {
         this.examens = examens;
     }
     
-    public List<Paiement> getPaiements() {
-        return paiements;
-    }
-    
-    public void setPaiements(List<Paiement> paiements) {
-        this.paiements = paiements;
-    }
+    // Paiement methods removed - no payment system
     
     // Helper methods
     public String getFullName() {

@@ -149,4 +149,8 @@ public class ProcessStep {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public UUID getDocumentTypeId() {
+        return documentType != null ? documentType.getId() : null;
+    }
 }

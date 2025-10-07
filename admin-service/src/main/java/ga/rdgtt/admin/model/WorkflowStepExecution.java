@@ -127,4 +127,18 @@ public class WorkflowStepExecution {
     
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    
+    public void setWorkflowInstanceId(UUID workflowInstanceId) {
+        if (this.workflowInstance == null) {
+            this.workflowInstance = new WorkflowInstance();
+        }
+        this.workflowInstance.setId(workflowInstanceId);
+    }
+    
+    public void setProcessStepId(UUID processStepId) {
+        if (this.processStep == null) {
+            this.processStep = new ProcessStep();
+        }
+        this.processStep.setId(processStepId);
+    }
 }

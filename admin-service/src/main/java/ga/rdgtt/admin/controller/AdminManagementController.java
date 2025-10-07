@@ -49,7 +49,8 @@ public class AdminManagementController {
     @PutMapping("/users/{id}")
     @PreAuthorize("hasRole('CHEF_SERVICE')")
     public ResponseEntity<AdminUser> updateUser(@PathVariable UUID id, @RequestBody AdminUser user) {
-        return ResponseEntity.ok(adminUserService.updateUser(id, user));
+        user.setId(id);
+        return ResponseEntity.ok(adminUserService.updateUser(user));
     }
     
     @DeleteMapping("/users/{id}")
@@ -77,7 +78,8 @@ public class AdminManagementController {
     @PutMapping("/departments/{id}")
     @PreAuthorize("hasRole('DIRECTEUR')")
     public ResponseEntity<Department> updateDepartment(@PathVariable UUID id, @RequestBody Department department) {
-        return ResponseEntity.ok(departmentService.updateDepartment(id, department));
+        department.setId(id);
+        return ResponseEntity.ok(departmentService.updateDepartment(department));
     }
     
     @DeleteMapping("/departments/{id}")
@@ -153,7 +155,7 @@ public class AdminManagementController {
     public ResponseEntity<WorkflowInstance> startWorkflow(@RequestParam String demandeId, 
                                                         @RequestParam UUID documentTypeId,
                                                         @RequestParam UUID userId) {
-        AdminUser user = adminUserService.getUserById(userId);
+        AdminUser user = adminUserService.getUserById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return ResponseEntity.ok(workflowManagementService.startWorkflow(demandeId, documentTypeId, user));
     }
     
@@ -164,7 +166,7 @@ public class AdminManagementController {
                                                            @RequestParam String decision,
                                                            @RequestParam(required = false) String commentaires,
                                                            @RequestParam UUID userId) {
-        AdminUser user = adminUserService.getUserById(userId);
+        AdminUser user = adminUserService.getUserById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         return ResponseEntity.ok(workflowManagementService.executeStep(workflowId, stepId, decision, commentaires, user));
     }
     
