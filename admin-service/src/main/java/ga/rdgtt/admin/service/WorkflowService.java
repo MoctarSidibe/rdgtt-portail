@@ -60,4 +60,9 @@ public class WorkflowService {
     public List<WorkflowStepExecution> getWorkflowHistory(UUID workflowId) {
         return workflowStepExecutionRepository.findByWorkflowInstanceIdOrderByDateDebut(workflowId);
     }
+    
+    public Optional<WorkflowInstance> getWorkflowByDemandeNumber(String demandeNumber) {
+        List<WorkflowInstance> workflows = workflowInstanceRepository.findByDemandeId(demandeNumber);
+        return workflows.isEmpty() ? Optional.empty() : Optional.of(workflows.get(0));
+    }
 }

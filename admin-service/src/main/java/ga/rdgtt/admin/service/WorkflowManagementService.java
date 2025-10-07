@@ -163,7 +163,8 @@ public class WorkflowManagementService {
      * Get workflow instance by demande ID
      */
     public Optional<WorkflowInstance> getWorkflowByDemandeNumber(String demandeNumber) {
-        return workflowInstanceRepository.findByDemandeId(demandeNumber);
+        List<WorkflowInstance> workflows = workflowInstanceRepository.findByDemandeId(demandeNumber);
+        return workflows.isEmpty() ? Optional.empty() : Optional.of(workflows.get(0));
     }
     
     /**

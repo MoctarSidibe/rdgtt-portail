@@ -112,7 +112,8 @@ public class AdminManagementController {
     @PutMapping("/bureaus/{id}")
     @PreAuthorize("hasRole('CHEF_SERVICE')")
     public ResponseEntity<Bureau> updateBureau(@PathVariable UUID id, @RequestBody Bureau bureau) {
-        return ResponseEntity.ok(bureauService.updateBureau(id, bureau));
+        bureau.setId(id);
+        return ResponseEntity.ok(bureauService.updateBureau(bureau));
     }
     
     @DeleteMapping("/bureaus/{id}")
