@@ -14,6 +14,8 @@ import Candidats from './pages/Candidats';
 import Permis from './pages/Permis';
 import Profile from './pages/Profile';
 import CitizenStatusCheck from './components/CitizenStatusCheck';
+import AutoEcolePortal from './pages/AutoEcolePortal';
+import RelatedServices from './pages/RelatedServices';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -34,6 +36,8 @@ function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/citizen/status" element={<CitizenStatusCheck />} />
+        <Route path="/auto-ecole/register" element={<AutoEcolePortal />} />
+        <Route path="/services/related" element={<RelatedServices />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     );

@@ -34,65 +34,30 @@ function HomePage() {
 
   const services = [
     {
-      id: 'admin-management',
-      title: 'Administration',
-      description: 'Gestion des départements, bureaux et processus de validation',
-      icon: <AssignmentIcon sx={{ fontSize: 60 }} />,
-      status: 'available',
-      statusText: 'Disponible',
-      color: '#1a237e',
-      features: [
-        'Gestion des départements',
-        'Gestion des bureaux',
-        'Configuration des workflows',
-        'Processus de validation',
-        'Gestion des utilisateurs admin'
-      ],
-      action: () => navigate('/admin/login')
-    },
-    {
-      id: 'auto-ecole',
-      title: 'Auto-École',
-      description: 'Gestion des auto-écoles, inscription des candidats et suivi de formation',
+      id: 'auto-ecole-registration',
+      title: 'Inscription Auto-École',
+      description: 'S\'inscrire dans une auto-école pour obtenir un permis de conduire',
       icon: <SchoolIcon sx={{ fontSize: 60 }} />,
       status: 'available',
       statusText: 'Disponible',
-      color: '#388e3c',
+      color: '#4CAF50',
       features: [
-        'Inscription des auto-écoles',
-        'Gestion des candidats',
-        'Suivi de formation',
-        'Processus d\'inspection',
-        'Génération des permis d\'exploitation'
+        'Inscription dans une auto-école',
+        'Formation théorique et pratique',
+        'Passage des examens',
+        'Suivi de progression',
+        'Obtention du permis'
       ],
-      action: () => navigate('/admin/login')
+      action: () => navigate('/auto-ecole/register')
     },
     {
-      id: 'permis-conduire',
-      title: 'Permis de Conduire',
-      description: 'Gestion complète des permis de conduire et services connexes',
-      icon: <CreditCardIcon sx={{ fontSize: 60 }} />,
-      status: 'available',
-      statusText: 'Disponible',
-      color: '#f57c00',
-      features: [
-        'Permis de conduire',
-        'Duplicata permis',
-        'Renouvellement permis',
-        'Catégorie C et D',
-        'Conversion et échange',
-        'Attestation d\'authenticité'
-      ],
-      action: () => navigate('/admin/login')
-    },
-    {
-      id: 'citizen-status',
+      id: 'status-check',
       title: 'Suivi de Demande',
-      description: 'Vérifiez le statut de votre demande administrative',
+      description: 'Vérifier le statut de votre demande de permis',
       icon: <PersonIcon sx={{ fontSize: 60 }} />,
       status: 'available',
       statusText: 'Disponible',
-      color: '#5d4037',
+      color: '#2196F3',
       features: [
         'Consultation du statut',
         'Suivi en temps réel',
@@ -100,6 +65,23 @@ function HomePage() {
         'Notifications de progression'
       ],
       action: () => navigate('/citizen/status')
+    },
+    {
+      id: 'related-services',
+      title: 'Services Connexes',
+      description: 'Duplicata, renouvellement, conversion et autres services',
+      icon: <CreditCardIcon sx={{ fontSize: 60 }} />,
+      status: 'available',
+      statusText: 'Disponible',
+      color: '#FF9800',
+      features: [
+        'Duplicata permis',
+        'Renouvellement C & D',
+        'Conversion permis étranger',
+        'Attestation d\'authenticité',
+        'Légalisation permis'
+      ],
+      action: () => navigate('/services/related')
     }
   ];
 
@@ -191,7 +173,7 @@ function HomePage() {
               Ministère des Transports, de la Marine Marchande et de la Logistique du Gabon
             </Typography>
             <Typography variant="h6" sx={{ opacity: 0.8, maxWidth: 600, mx: 'auto', mb: 3 }}>
-              Plateforme de gestion administrative et de suivi des demandes
+              Portail citoyen pour l'inscription auto-école et le suivi des demandes
             </Typography>
             <Box
               sx={{
@@ -226,7 +208,7 @@ function HomePage() {
             Services Disponibles
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-            Administration interne et suivi des demandes pour les citoyens
+            Services pour les citoyens : inscription auto-école, suivi des demandes et services connexes
           </Typography>
         </Box>
 
