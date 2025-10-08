@@ -2,6 +2,8 @@ package ga.rdgtt.admin.repository;
 
 import ga.rdgtt.admin.model.WorkflowStepExecution;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,10 +12,12 @@ import java.util.UUID;
 @Repository
 public interface WorkflowStepExecutionRepository extends JpaRepository<WorkflowStepExecution, UUID> {
     
-    // Use the relationship instead of direct field
-    List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByCreatedAtAsc(UUID workflowInstanceId);
+    // Use @Query to work with the relationship
+    @Query("SELECT wse FROM WorkflowStepExecution wse WHERE wse.workflowInstance.id = :workflowInstanceId ORDER BY wse.createdAt ASC")
+    List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByCreatedAtAsc(@Param("workflowInstanceId") UUID workflowInstanceId);
     
-    List<WorkflowStepExecution> findByWorkflowInstanceIdAndStatut(UUID workflowInstanceId, String statut);
+    @Query("SELECT wse FROM WorkflowStepExecution wse WHERE wse.workflowInstance.id = :workflowInstanceId AND wse.statut = :statut")
+    List<WorkflowStepExecution> findByWorkflowInstanceIdAndStatut(@Param("workflowInstanceId") UUID workflowInstanceId, @Param("statut") String statut);
     
     List<WorkflowStepExecution> findByUtilisateurId(UUID utilisateurId);
     
@@ -21,5 +25,6 @@ public interface WorkflowStepExecutionRepository extends JpaRepository<WorkflowS
     
     List<WorkflowStepExecution> findByBureauId(UUID bureauId);
     
-    List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByDateDebut(UUID workflowInstanceId);
+    @Query("SELECT wse FROM WorkflowStepExecution wse WHERE wse.workflowInstance.id = :workflowInstanceId ORDER BY wse.dateDebut ASC")
+    List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByDateDebut(@Param("workflowInstanceId") UUID workflowInstanceId);
 }
