@@ -123,6 +123,29 @@ services:
       - "traefik.http.routers.auto-ecole.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/auto-ecole`)"
       - "traefik.http.services.auto-ecole.loadbalancer.server.port=8082"
 
+  usager-service:
+    build: ./usager-service
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rdgtt_portail
+      SPRING_DATASOURCE_USERNAME: rdgtt_user
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_CLOUD_CONSUL_HOST: consul
+      SPRING_CLOUD_CONSUL_PORT: 8500
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - rdgtt-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.usager.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/usager`)"
+      - "traefik.http.services.usager.loadbalancer.server.port=8081"
+
   frontend:
     build: ./frontend
     networks:
