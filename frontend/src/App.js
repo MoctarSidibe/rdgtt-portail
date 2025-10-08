@@ -16,6 +16,9 @@ import Profile from './pages/Profile';
 import CitizenStatusCheck from './components/CitizenStatusCheck';
 import AutoEcolePortal from './pages/AutoEcolePortal';
 import RelatedServices from './pages/RelatedServices';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminWorkflows from './pages/AdminWorkflows';
+import AdminProcessSteps from './pages/AdminProcessSteps';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -55,6 +58,15 @@ function AppRoutes() {
         <Route path="/candidats" element={<Candidats />} />
         <Route path="/permis" element={<Permis />} />
         <Route path="/profile" element={<Profile />} />
+        
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/workflows" element={<AdminWorkflows />} />
+        <Route path="/admin/workflows/:id/steps" element={<AdminProcessSteps />} />
+        <Route path="/admin/roles" element={<div>Admin Roles - Coming Soon</div>} />
+        <Route path="/admin/organization" element={<div>Admin Organization - Coming Soon</div>} />
+        <Route path="/admin/process" element={<div>Admin Process - Coming Soon</div>} />
+        
         <Route path="/login" element={<Navigate to="/dashboard" />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
