@@ -39,7 +39,7 @@ const getMenuItems = (userRole) => {
   const allMenuItems = [
     { text: 'Tableau de bord', icon: <DashboardIcon />, path: '/dashboard', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT', 'CITOYEN'] },
     { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/users', roles: ['ADMIN', 'CHEF_SERVICE'] },
-    { text: 'Départements', icon: <BusinessIcon />, path: '/departments', roles: ['ADMIN', 'CHEF_SERVICE'] },
+           { text: 'Services', icon: <BusinessIcon />, path: '/departments', roles: ['ADMIN', 'CHEF_SERVICE'] },
     { text: 'Bureaux', icon: <BusinessIcon />, path: '/bureaus', roles: ['ADMIN', 'CHEF_SERVICE'] },
     { text: 'Auto-Écoles', icon: <SchoolIcon />, path: '/auto-ecoles', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT'] },
     { text: 'Candidats', icon: <PersonIcon />, path: '/candidats', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT'] },

@@ -353,7 +353,7 @@ function AdminOrganization() {
             Organisation Administrative
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Gérez les départements et bureaux de l'administration
+            Gérez les services et bureaux de l'administration
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
@@ -362,7 +362,7 @@ function AdminOrganization() {
             startIcon={<AddIcon />}
             onClick={() => handleOpenDialog('department')}
           >
-            Nouveau Département
+            Nouveau Service
           </Button>
           <Button
             variant="contained"
@@ -392,7 +392,7 @@ function AdminOrganization() {
                     {departments.length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Départements
+                    Services
                   </Typography>
                 </Box>
               </Box>
@@ -465,7 +465,7 @@ function AdminOrganization() {
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="organization tabs">
           <Tab label="Vue Hiérarchique" />
-          <Tab label="Départements" />
+          <Tab label="Services" />
           <Tab label="Bureaux" />
         </Tabs>
       </Box>
@@ -695,7 +695,7 @@ function AdminOrganization() {
                       Responsable: {bureau.head}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Département: {bureau.department.name}
+                      Service: {bureau.department.name}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Utilisateurs: {bureau.userCount}
@@ -735,21 +735,21 @@ function AdminOrganization() {
       {/* Create/Edit Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          {editingItem ? `Modifier ${dialogType === 'department' ? 'le Département' : 'le Bureau'}` : 
-           `Nouveau ${dialogType === 'department' ? 'Département' : 'Bureau'}`}
+          {editingItem ? `Modifier ${dialogType === 'department' ? 'le Service' : 'le Bureau'}` : 
+           `Nouveau ${dialogType === 'department' ? 'Service' : 'Bureau'}`}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
             {dialogType === 'bureau' && !editingItem && (
               <FormControl fullWidth>
-                <InputLabel>Département parent</InputLabel>
+                <InputLabel>Service parent</InputLabel>
                 <Select
                   value={parentDepartment?.id || ''}
                   onChange={(e) => {
                     const dept = departments.find(d => d.id === e.target.value);
                     setParentDepartment(dept);
                   }}
-                  label="Département parent"
+                  label="Service parent"
                   required
                 >
                   {departments.map((dept) => (
@@ -764,7 +764,7 @@ function AdminOrganization() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label={`Nom ${dialogType === 'department' ? 'du département' : 'du bureau'}`}
+                  label={`Nom ${dialogType === 'department' ? 'du service' : 'du bureau'}`}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   fullWidth
@@ -773,7 +773,7 @@ function AdminOrganization() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label={`Code ${dialogType === 'department' ? 'du département' : 'du bureau'}`}
+                  label={`Code ${dialogType === 'department' ? 'du service' : 'du bureau'}`}
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                   fullWidth
@@ -846,7 +846,7 @@ function AdminOrganization() {
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 />
               }
-              label={`${dialogType === 'department' ? 'Département' : 'Bureau'} actif`}
+              label={`${dialogType === 'department' ? 'Service' : 'Bureau'} actif`}
             />
           </Box>
         </DialogContent>

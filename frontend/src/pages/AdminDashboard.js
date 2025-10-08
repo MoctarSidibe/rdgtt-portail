@@ -51,19 +51,27 @@ const adminFeatures = [
     stats: '8 rôles configurés'
   },
   {
-    title: 'Départements & Bureaux',
+    title: 'Services & Bureaux',
     description: 'Organiser la structure administrative',
     icon: <DeptIcon sx={{ fontSize: 40 }} />,
     path: '/admin/organization',
     color: '#ed6c02',
-    stats: '4 départements, 12 bureaux'
+    stats: '4 services, 12 bureaux'
+  },
+  {
+    title: 'Types de Documents',
+    description: 'Gérer les types de documents et processus',
+    icon: <ProcessIcon sx={{ fontSize: 40 }} />,
+    path: '/admin/document-types',
+    color: '#9c27b0',
+    stats: '6 types configurés'
   },
   {
     title: 'Processus Métier',
     description: 'Configurer les étapes de validation',
-    icon: <ProcessIcon sx={{ fontSize: 40 }} />,
+    icon: <ValidationIcon sx={{ fontSize: 40 }} />,
     path: '/admin/process',
-    color: '#9c27b0',
+    color: '#f57c00',
     stats: '25 processus configurés'
   }
 ];

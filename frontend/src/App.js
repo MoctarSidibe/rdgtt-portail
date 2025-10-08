@@ -19,6 +19,7 @@ import RelatedServices from './pages/RelatedServices';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminWorkflows from './pages/AdminWorkflows';
 import AdminProcessSteps from './pages/AdminProcessSteps';
+import AdminDocumentTypes from './pages/AdminDocumentTypes';
 import AdminRoles from './pages/AdminRoles';
 import AdminOrganization from './pages/AdminOrganization';
 
@@ -67,6 +68,7 @@ function AppRoutes() {
         <Route path="/admin/workflows/:id/steps" element={<AdminProcessSteps />} />
         <Route path="/admin/roles" element={<AdminRoles />} />
         <Route path="/admin/organization" element={<AdminOrganization />} />
+        <Route path="/admin/document-types" element={<AdminDocumentTypes />} />
         <Route path="/admin/process" element={<div>Admin Process - Coming Soon</div>} />
         
         <Route path="/login" element={<Navigate to="/dashboard" />} />
