@@ -1,8 +1,6 @@
 package ga.rdgtt.admin.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -21,17 +19,15 @@ public class ProcessStep {
     @JoinColumn(name = "document_type_id", nullable = false)
     private DocumentType documentType;
     
-    @NotBlank(message = "Le nom de l'étape est obligatoire")
     @Column(name = "nom", nullable = false)
     private String nom;
     
     @Column(name = "code", nullable = false)
     private String code;
     
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     
-    @NotNull(message = "L'ordre de l'étape est obligatoire")
     @Column(name = "ordre", nullable = false)
     private Integer ordre;
     
@@ -42,25 +38,16 @@ public class ProcessStep {
     private UUID bureauId;
     
     @Column(name = "role_requis")
-    private String roleRequis; // ADMIN, DC, SEV, SAF, etc.
+    private String roleRequis;
     
     @Column(name = "type_validation")
-    private String typeValidation; // automatique, manuelle, hybride
+    private String typeValidation;
     
     @Column(name = "conditions_validation", columnDefinition = "TEXT")
-    private String conditionsValidation; // JSON conditions
+    private String conditionsValidation;
     
-    @Column(name = "delai_max_jours")
-    private Integer delaiMaxJours;
-    
-    @Column(name = "obligatoire", nullable = false)
-    private Boolean obligatoire = true;
-    
-    @Column(name = "peut_rejeter", nullable = false)
-    private Boolean peutRejeter = true;
-    
-    @Column(name = "peut_rediriger", nullable = false)
-    private Boolean peutRediriger = false;
+    @Column(name = "delai_jours")
+    private Integer delaiJours = 5;
     
     @Column(name = "etape_suivante_id")
     private UUID etapeSuivanteId;
@@ -68,7 +55,7 @@ public class ProcessStep {
     @Column(name = "etape_rejet_id")
     private UUID etapeRejetId;
     
-    @Column(name = "actif", nullable = false)
+    @Column(name = "actif")
     private Boolean actif = true;
     
     @CreationTimestamp
@@ -82,11 +69,11 @@ public class ProcessStep {
     // Constructors
     public ProcessStep() {}
     
-    public ProcessStep(String nom, String code, Integer ordre, String typeValidation) {
+    public ProcessStep(DocumentType documentType, String nom, String code, Integer ordre) {
+        this.documentType = documentType;
         this.nom = nom;
         this.code = code;
         this.ordre = ordre;
-        this.typeValidation = typeValidation;
     }
     
     // Getters and Setters
@@ -123,17 +110,8 @@ public class ProcessStep {
     public String getConditionsValidation() { return conditionsValidation; }
     public void setConditionsValidation(String conditionsValidation) { this.conditionsValidation = conditionsValidation; }
     
-    public Integer getDelaiMaxJours() { return delaiMaxJours; }
-    public void setDelaiMaxJours(Integer delaiMaxJours) { this.delaiMaxJours = delaiMaxJours; }
-    
-    public Boolean getObligatoire() { return obligatoire; }
-    public void setObligatoire(Boolean obligatoire) { this.obligatoire = obligatoire; }
-    
-    public Boolean getPeutRejeter() { return peutRejeter; }
-    public void setPeutRejeter(Boolean peutRejeter) { this.peutRejeter = peutRejeter; }
-    
-    public Boolean getPeutRediriger() { return peutRediriger; }
-    public void setPeutRediriger(Boolean peutRediriger) { this.peutRediriger = peutRediriger; }
+    public Integer getDelaiJours() { return delaiJours; }
+    public void setDelaiJours(Integer delaiJours) { this.delaiJours = delaiJours; }
     
     public UUID getEtapeSuivanteId() { return etapeSuivanteId; }
     public void setEtapeSuivanteId(UUID etapeSuivanteId) { this.etapeSuivanteId = etapeSuivanteId; }
@@ -150,6 +128,7 @@ public class ProcessStep {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     
+    // Add method to get documentTypeId for repository queries
     public UUID getDocumentTypeId() {
         return documentType != null ? documentType.getId() : null;
     }
