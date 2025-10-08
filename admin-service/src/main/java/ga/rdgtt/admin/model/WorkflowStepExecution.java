@@ -19,6 +19,9 @@ public class WorkflowStepExecution {
     @JoinColumn(name = "workflow_instance_id", nullable = false)
     private WorkflowInstance workflowInstance;
     
+    @Column(name = "workflow_instance_id", insertable = false, updatable = false)
+    private UUID workflowInstanceId;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "process_step_id", nullable = false)
     private ProcessStep processStep;
@@ -82,6 +85,9 @@ public class WorkflowStepExecution {
     
     public WorkflowInstance getWorkflowInstance() { return workflowInstance; }
     public void setWorkflowInstance(WorkflowInstance workflowInstance) { this.workflowInstance = workflowInstance; }
+    
+    public UUID getWorkflowInstanceId() { return workflowInstanceId; }
+    public void setWorkflowInstanceId(UUID workflowInstanceId) { this.workflowInstanceId = workflowInstanceId; }
     
     public ProcessStep getProcessStep() { return processStep; }
     public void setProcessStep(ProcessStep processStep) { this.processStep = processStep; }

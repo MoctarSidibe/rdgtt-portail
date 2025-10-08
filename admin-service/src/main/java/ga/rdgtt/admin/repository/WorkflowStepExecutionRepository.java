@@ -10,6 +10,7 @@ import java.util.UUID;
 @Repository
 public interface WorkflowStepExecutionRepository extends JpaRepository<WorkflowStepExecution, UUID> {
     
+    // Use the relationship instead of direct field
     List<WorkflowStepExecution> findByWorkflowInstanceIdOrderByCreatedAtAsc(UUID workflowInstanceId);
     
     List<WorkflowStepExecution> findByWorkflowInstanceIdAndStatut(UUID workflowInstanceId, String statut);
