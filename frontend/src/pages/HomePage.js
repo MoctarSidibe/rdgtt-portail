@@ -6,363 +6,335 @@ import {
   Grid,
   Card,
   CardContent,
-  CardActions,
+  CardActionArea,
+  AppBar,
+  Toolbar,
   Button,
   Chip,
-  Paper,
   Avatar,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
 import {
-  School as SchoolIcon,
-  CreditCard as CreditCardIcon,
-  Assignment as AssignmentIcon,
-  DirectionsCar as CarIcon,
-  LocalShipping as ShippingIcon,
-  Person as PersonIcon,
-  CheckCircle as CheckIcon,
-  Schedule as ScheduleIcon,
-  Construction as ConstructionIcon,
+  AdminPanelSettings as AdminIcon,
+  School as AutoEcoleIcon,
+  CreditCard as PermisIcon,
+  Person as CitizenIcon,
+  CheckCircle as StatusIcon,
+  Business as BureauIcon,
+  Assignment as WorkflowIcon,
+  Settings as ConfigIcon,
+  Timeline as ProcessIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+const services = [
+  {
+    title: 'Administrateur Système',
+    description: 'Configuration des workflows, gestion des rôles et validation des processus administratifs',
+    icon: <AdminIcon sx={{ fontSize: 40 }} />,
+    path: '/admin',
+    color: '#1976d2',
+    features: ['Workflows', 'Rôles', 'Validation', 'Configuration']
+  },
+  {
+    title: 'Auto-Écoles',
+    description: 'Gestion des auto-écoles, candidats et formation à la conduite',
+    icon: <AutoEcoleIcon sx={{ fontSize: 40 }} />,
+    path: '/auto-ecole/register',
+    color: '#2e7d32',
+    features: ['Inscription', 'Candidats', 'Formation', 'Examens']
+  },
+  {
+    title: 'Permis de Conduire',
+    description: 'Délivrance et gestion des permis de conduire',
+    icon: <PermisIcon sx={{ fontSize: 40 }} />,
+    path: '/permis',
+    color: '#ed6c02',
+    features: ['Demandes', 'Validation', 'Délivrance', 'Suivi']
+  },
+  {
+    title: 'Statut Citoyen',
+    description: 'Vérification du statut de vos démarches administratives',
+    icon: <StatusIcon sx={{ fontSize: 40 }} />,
+    path: '/citizen/status',
+    color: '#9c27b0',
+    features: ['Vérification', 'Statut', 'Suivi', 'Notifications']
+  }
+];
+
+const adminFeatures = [
+  {
+    title: 'Configuration des Workflows',
+    description: 'Créer et gérer les processus de validation',
+    icon: <WorkflowIcon />,
+    path: '/admin/workflows'
+  },
+  {
+    title: 'Gestion des Rôles',
+    description: 'Définir les permissions et responsabilités',
+    icon: <AdminIcon />,
+    path: '/admin/roles'
+  },
+  {
+    title: 'Départements & Bureaux',
+    description: 'Organiser la structure administrative',
+    icon: <BureauIcon />,
+    path: '/admin/organization'
+  },
+  {
+    title: 'Processus Métier',
+    description: 'Configurer les étapes de validation',
+    icon: <ProcessIcon />,
+    path: '/admin/process'
+  }
+];
+
+function ServiceCard({ service, onClick }) {
+  return (
+    <Card 
+      sx={{ 
+        height: '100%', 
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: 6,
+        }
+      }}
+    >
+      <CardActionArea onClick={onClick} sx={{ height: '100%' }}>
+        <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Avatar sx={{ bgcolor: service.color, mr: 2 }}>
+              {service.icon}
+            </Avatar>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+              {service.title}
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flexGrow: 1 }}>
+            {service.description}
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {service.features.map((feature, index) => (
+              <Chip 
+                key={index} 
+                label={feature} 
+                size="small" 
+                sx={{ 
+                  bgcolor: `${service.color}20`,
+                  color: service.color,
+                  fontWeight: 'medium'
+                }} 
+              />
+            ))}
+          </Box>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}
 
 function HomePage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const navigate = useNavigate();
 
-  const services = [
-    {
-      id: 'auto-ecole-registration',
-      title: 'Inscription Auto-École',
-      description: 'S\'inscrire dans une auto-école pour obtenir un permis de conduire',
-      icon: <SchoolIcon sx={{ fontSize: 60 }} />,
-      status: 'available',
-      statusText: 'Disponible',
-      color: '#4CAF50',
-      features: [
-        'Inscription dans une auto-école',
-        'Formation théorique et pratique',
-        'Passage des examens',
-        'Suivi de progression',
-        'Obtention du permis'
-      ],
-      action: () => navigate('/auto-ecole/register')
-    },
-    {
-      id: 'status-check',
-      title: 'Suivi de Demande',
-      description: 'Vérifier le statut de votre demande de permis',
-      icon: <PersonIcon sx={{ fontSize: 60 }} />,
-      status: 'available',
-      statusText: 'Disponible',
-      color: '#2196F3',
-      features: [
-        'Consultation du statut',
-        'Suivi en temps réel',
-        'Historique des démarches',
-        'Notifications de progression'
-      ],
-      action: () => navigate('/citizen/status')
-    },
-    {
-      id: 'related-services',
-      title: 'Services Connexes',
-      description: 'Duplicata, renouvellement, conversion et autres services',
-      icon: <CreditCardIcon sx={{ fontSize: 60 }} />,
-      status: 'available',
-      statusText: 'Disponible',
-      color: '#FF9800',
-      features: [
-        'Duplicata permis',
-        'Renouvellement C & D',
-        'Conversion permis étranger',
-        'Attestation d\'authenticité',
-        'Légalisation permis'
-      ],
-      action: () => navigate('/services/related')
-    }
-  ];
+  const handleServiceClick = (path) => {
+    navigate(path);
+  };
 
-  const getStatusChip = (status) => {
-    const statusConfig = {
-      available: { color: 'success', icon: <CheckIcon /> },
-      development: { color: 'warning', icon: <ConstructionIcon /> },
-      'coming-soon': { color: 'info', icon: <ScheduleIcon /> }
-    };
-    
-    const config = statusConfig[status] || statusConfig['coming-soon'];
-    
-    return (
-      <Chip
-        icon={config.icon}
-        label={status === 'available' ? 'Disponible' : status === 'development' ? 'En développement' : 'Bientôt disponible'}
-        color={config.color}
-        variant="filled"
-        size="small"
-      />
-    );
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      {/* Header Section */}
-      <Paper
-        elevation={0}
-        sx={{
-          background: 'linear-gradient(135deg, #1a237e 0%, #283593 100%)',
-          color: 'white',
-          py: 8,
-          mb: 4,
-          position: 'relative',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: '8px',
-            background: 'linear-gradient(90deg, #00a651 0%, #00a651 33.33%, #fcd116 33.33%, #fcd116 66.66%, #1a237e 66.66%, #1a237e 100%)',
-          }
-        }}
-      >
-        <Container maxWidth="lg">
-          <Box textAlign="center">
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 3,
-                mb: 3,
-                flexWrap: 'wrap',
-              }}
-            >
-              <Box
-                component="img"
-                src="/dgttlogo.jpg"
-                alt="DGTT Logo"
-                sx={{
-                  width: 120,
-                  height: 120,
-                  objectFit: 'contain',
-                  borderRadius: 2,
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  p: 1,
-                }}
-              />
-              <Box
-                component="img"
-                src="/aninf.png"
-                alt="ANINF Logo"
-                sx={{
-                  width: 120,
-                  height: 120,
-                  objectFit: 'contain',
-                  borderRadius: '50%',
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  p: 1,
-                }}
-              />
-            </Box>
-            <Typography variant="h2" component="h1" gutterBottom fontWeight="bold">
-              DGTT Portail
-            </Typography>
-            <Typography variant="h5" component="h2" sx={{ mb: 2, opacity: 0.9 }}>
-              Ministère des Transports, de la Marine Marchande et de la Logistique du Gabon
-            </Typography>
-            <Typography variant="h6" sx={{ opacity: 0.8, maxWidth: 600, mx: 'auto', mb: 3 }}>
-              Portail citoyen pour l'inscription auto-école et le suivi des demandes
-            </Typography>
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                mt: 2,
-              }}
-            >
-              <Box
-                component="img"
-                src="/rengus-logo.jpg"
-                alt="Rengus Logo"
-                sx={{
-                  width: 120,
-                  height: 120,
-                  objectFit: 'contain',
-                  borderRadius: 2,
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  p: 1,
-                }}
-              />
+    <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50' }}>
+      {/* Top Navigation Bar */}
+      <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'white', color: 'text.primary' }}>
+        <Toolbar>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+            <Avatar 
+              src="/dgttlogo.jpg" 
+              sx={{ width: 40, height: 40, mr: 2 }}
+              alt="DGTT Logo"
+            />
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                R-DGTT Portail
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                République Gabonaise
+              </Typography>
             </Box>
           </Box>
-        </Container>
-      </Paper>
+          
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/services/related')}
+              sx={{ 
+                borderColor: '#1976d2',
+                color: '#1976d2',
+                '&:hover': { borderColor: '#1976d2', bgcolor: '#1976d210' }
+              }}
+            >
+              Services Connexes
+            </Button>
+            {!user && (
+              <Button
+                variant="contained"
+                onClick={handleLogin}
+                sx={{ 
+                  bgcolor: '#1976d2',
+                  '&:hover': { bgcolor: '#1565c0' }
+                }}
+              >
+                Connexion
+              </Button>
+            )}
+            {user && (
+              <Button
+                variant="contained"
+                onClick={() => navigate('/dashboard')}
+                sx={{ 
+                  bgcolor: '#1976d2',
+                  '&:hover': { bgcolor: '#1565c0' }
+                }}
+              >
+                Tableau de bord
+              </Button>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-      {/* Services Section */}
-      <Container maxWidth="lg" sx={{ pb: 8 }}>
-        <Box textAlign="center" mb={6}>
-          <Typography variant="h3" component="h2" gutterBottom fontWeight="bold">
-            Services Disponibles
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Hero Section */}
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          <Typography 
+            variant={isMobile ? "h4" : "h3"} 
+            component="h1" 
+            sx={{ 
+              fontWeight: 'bold', 
+              mb: 2,
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            Portail Numérique des Transports
           </Typography>
-          <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-            Services pour les citoyens : inscription auto-école, suivi des demandes et services connexes
+          <Typography 
+            variant="h6" 
+            color="text.secondary" 
+            sx={{ mb: 4, maxWidth: 800, mx: 'auto' }}
+          >
+            Simplifiez vos démarches administratives avec notre plateforme numérique 
+            dédiée aux services de transport du Gabon
           </Typography>
         </Box>
 
-        <Grid container spacing={4}>
-          {services.map((service) => (
-            <Grid item xs={12} md={6} lg={4} key={service.id}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: theme.shadows[8],
-                  },
-                  border: `2px solid ${service.color}20`,
-                  position: 'relative',
-                  overflow: 'visible',
-                }}
-              >
-                {/* Status Badge */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: -12,
-                    right: 16,
-                    zIndex: 1,
-                  }}
-                >
-                  {getStatusChip(service.status)}
-                </Box>
-
-                <CardContent sx={{ flexGrow: 1, pt: 3 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      textAlign: 'center',
-                      mb: 3,
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        bgcolor: `${service.color}20`,
-                        color: service.color,
-                        width: 100,
-                        height: 100,
-                        mb: 2,
-                      }}
-                    >
-                      {service.icon}
-                    </Avatar>
-                    <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                      {service.title}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                      {service.description}
-                    </Typography>
-                  </Box>
-
-                  {/* Features List */}
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                      Fonctionnalités :
-                    </Typography>
-                    {service.features.map((feature, index) => (
-                      <Box
-                        key={index}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          mb: 1,
-                          fontSize: '0.875rem',
-                        }}
-                      >
-                        <CheckIcon
-                          sx={{
-                            fontSize: 16,
-                            color: service.color,
-                            mr: 1,
-                          }}
-                        />
-                        <Typography variant="body2">{feature}</Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                </CardContent>
-
-                <CardActions sx={{ p: 2, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant={service.status === 'available' ? 'contained' : 'outlined'}
-                    size="large"
-                    onClick={service.action}
-                    disabled={service.status !== 'available'}
-                    sx={{
-                      bgcolor: service.status === 'available' ? service.color : 'transparent',
-                      color: service.status === 'available' ? 'white' : service.color,
-                      borderColor: service.color,
-                      '&:hover': {
-                        bgcolor: service.status === 'available' ? `${service.color}dd` : `${service.color}20`,
-                      },
-                    }}
-                  >
-                    {service.status === 'available' 
-                      ? 'Accéder au service' 
-                      : service.status === 'development' 
-                        ? 'En cours de développement' 
-                        : 'Bientôt disponible'
-                    }
-                  </Button>
-                </CardActions>
-              </Card>
+        {/* Main Services Grid */}
+        <Grid container spacing={4} sx={{ mb: 6 }}>
+          {services.map((service, index) => (
+            <Grid item xs={12} sm={6} lg={3} key={index}>
+              <ServiceCard 
+                service={service} 
+                onClick={() => handleServiceClick(service.path)}
+              />
             </Grid>
           ))}
         </Grid>
 
-        {/* Footer Info */}
-        <Box textAlign="center" mt={8}>
-          <Paper
-            elevation={0}
-            sx={{
-              p: 4,
-              bgcolor: 'grey.50',
-              border: '1px solid',
-              borderColor: 'grey.200',
+        {/* Admin System Section */}
+        <Box sx={{ mb: 6 }}>
+          <Typography 
+            variant="h4" 
+            component="h2" 
+            sx={{ 
+              fontWeight: 'bold', 
+              mb: 3, 
+              textAlign: 'center',
+              color: '#1976d2'
             }}
           >
-            <Typography variant="h6" gutterBottom fontWeight="bold">
-              Support Technique
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-              Contactez l'équipe technique pour toute assistance administrative
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-              <Chip
-                label="📞 +241 01 23 45 67"
-                variant="outlined"
-                color="primary"
-              />
-              <Chip
-                label="✉️ contact@rdgtt.ga"
-                variant="outlined"
-                color="primary"
-              />
-              <Chip
-                label="🕒 Lun-Ven: 8h-17h"
-                variant="outlined"
-                color="primary"
-              />
-            </Box>
-          </Paper>
+            Administration Système
+          </Typography>
+          <Typography 
+            variant="body1" 
+            color="text.secondary" 
+            sx={{ textAlign: 'center', mb: 4, maxWidth: 600, mx: 'auto' }}
+          >
+            Outils avancés pour la configuration et la gestion des workflows administratifs
+          </Typography>
+          
+          <Grid container spacing={3}>
+            {adminFeatures.map((feature, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card 
+                  sx={{ 
+                    height: '100%',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      borderColor: '#1976d2',
+                      transform: 'translateY(-2px)',
+                      boxShadow: 4,
+                    }
+                  }}
+                >
+                  <CardActionArea onClick={() => handleServiceClick(feature.path)}>
+                    <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                      <Avatar sx={{ bgcolor: '#1976d2', mx: 'auto', mb: 2, width: 56, height: 56 }}>
+                        {feature.icon}
+                      </Avatar>
+                      <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        {feature.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {feature.description}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Quick Stats */}
+        <Box sx={{ 
+          bgcolor: 'white', 
+          borderRadius: 2, 
+          p: 4, 
+          boxShadow: 1,
+          textAlign: 'center'
+        }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#1976d2' }}>
+            Services Disponibles
+          </Typography>
+          <Grid container spacing={4}>
+            <Grid item xs={6} md={3}>
+              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#1976d2' }}>4</Typography>
+              <Typography variant="body2" color="text.secondary">Services Principaux</Typography>
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>24/7</Typography>
+              <Typography variant="body2" color="text.secondary">Disponibilité</Typography>
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#ed6c02' }}>100%</Typography>
+              <Typography variant="body2" color="text.secondary">Numérisé</Typography>
+            </Grid>
+            <Grid item xs={6} md={3}>
+              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>✓</Typography>
+              <Typography variant="body2" color="text.secondary">Sécurisé</Typography>
+            </Grid>
+          </Grid>
         </Box>
       </Container>
     </Box>
