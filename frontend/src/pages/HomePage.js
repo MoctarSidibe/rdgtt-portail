@@ -29,40 +29,50 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const services = [
-  {
-    title: 'Administrateur Système',
-    description: 'Configuration des workflows, gestion des rôles et validation des processus administratifs',
-    icon: <AdminIcon sx={{ fontSize: 40 }} />,
-    path: '/admin',
-    color: '#1976d2',
-    features: ['Workflows', 'Rôles', 'Validation', 'Configuration']
-  },
-  {
-    title: 'Auto-Écoles',
-    description: 'Gestion des auto-écoles, candidats et formation à la conduite',
-    icon: <AutoEcoleIcon sx={{ fontSize: 40 }} />,
-    path: '/auto-ecole/register',
-    color: '#2e7d32',
-    features: ['Inscription', 'Candidats', 'Formation', 'Examens']
-  },
-  {
-    title: 'Permis de Conduire',
-    description: 'Délivrance et gestion des permis de conduire',
-    icon: <PermisIcon sx={{ fontSize: 40 }} />,
-    path: '/permis',
-    color: '#ed6c02',
-    features: ['Demandes', 'Validation', 'Délivrance', 'Suivi']
-  },
-  {
-    title: 'Statut Citoyen',
-    description: 'Vérification du statut de vos démarches administratives',
-    icon: <StatusIcon sx={{ fontSize: 40 }} />,
-    path: '/citizen/status',
-    color: '#9c27b0',
-    features: ['Vérification', 'Statut', 'Suivi', 'Notifications']
-  }
-];
+const getServices = (userRole) => {
+  const allServices = [
+    {
+      title: 'Administrateur Système',
+      description: 'Configuration des workflows, gestion des rôles et validation des processus administratifs',
+      icon: <AdminIcon sx={{ fontSize: 40 }} />,
+      path: '/admin',
+      color: '#1976d2',
+      features: ['Workflows', 'Rôles', 'Validation', 'Configuration'],
+      roles: ['ADMIN', 'CHEF_SERVICE']
+    },
+    {
+      title: 'Auto-Écoles',
+      description: 'Gestion des auto-écoles, candidats et formation à la conduite',
+      icon: <AutoEcoleIcon sx={{ fontSize: 40 }} />,
+      path: '/auto-ecole/register',
+      color: '#2e7d32',
+      features: ['Inscription', 'Candidats', 'Formation', 'Examens'],
+      roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT', 'CITOYEN']
+    },
+    {
+      title: 'Permis de Conduire',
+      description: 'Délivrance et gestion des permis de conduire',
+      icon: <PermisIcon sx={{ fontSize: 40 }} />,
+      path: '/permis',
+      color: '#ed6c02',
+      features: ['Demandes', 'Validation', 'Délivrance', 'Suivi'],
+      roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT', 'CITOYEN']
+    },
+    {
+      title: 'Statut Citoyen',
+      description: 'Vérification du statut de vos démarches administratives',
+      icon: <StatusIcon sx={{ fontSize: 40 }} />,
+      path: '/citizen/status',
+      color: '#9c27b0',
+      features: ['Vérification', 'Statut', 'Suivi', 'Notifications'],
+      roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT', 'CITOYEN']
+    }
+  ];
+  
+  return allServices.filter(service => 
+    !userRole || service.roles.includes(userRole) || service.roles.includes('CITOYEN')
+  );
+};
 
 const adminFeatures = [
   {
@@ -240,7 +250,7 @@ function HomePage() {
 
         {/* Main Services Grid */}
         <Grid container spacing={4} sx={{ mb: 6 }}>
-          {services.map((service, index) => (
+          {getServices(user?.role).map((service, index) => (
             <Grid item xs={12} sm={6} lg={3} key={index}>
               <ServiceCard 
                 service={service} 
@@ -250,61 +260,63 @@ function HomePage() {
           ))}
         </Grid>
 
-        {/* Admin System Section */}
-        <Box sx={{ mb: 6 }}>
-          <Typography 
-            variant="h4" 
-            component="h2" 
-            sx={{ 
-              fontWeight: 'bold', 
-              mb: 3, 
-              textAlign: 'center',
-              color: '#1976d2'
-            }}
-          >
-            Administration Système
-          </Typography>
-          <Typography 
-            variant="body1" 
-            color="text.secondary" 
-            sx={{ textAlign: 'center', mb: 4, maxWidth: 600, mx: 'auto' }}
-          >
-            Outils avancés pour la configuration et la gestion des workflows administratifs
-          </Typography>
-          
-          <Grid container spacing={3}>
-            {adminFeatures.map((feature, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    border: '2px solid transparent',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      borderColor: '#1976d2',
-                      transform: 'translateY(-2px)',
-                      boxShadow: 4,
-                    }
-                  }}
-                >
-                  <CardActionArea onClick={() => handleServiceClick(feature.path)}>
-                    <CardContent sx={{ p: 3, textAlign: 'center' }}>
-                      <Avatar sx={{ bgcolor: '#1976d2', mx: 'auto', mb: 2, width: 56, height: 56 }}>
-                        {feature.icon}
-                      </Avatar>
-                      <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+        {/* Admin System Section - Only visible to admin users */}
+        {user && (user.role === 'ADMIN' || user.role === 'CHEF_SERVICE') && (
+          <Box sx={{ mb: 6 }}>
+            <Typography 
+              variant="h4" 
+              component="h2" 
+              sx={{ 
+                fontWeight: 'bold', 
+                mb: 3, 
+                textAlign: 'center',
+                color: '#1976d2'
+              }}
+            >
+              Administration Système
+            </Typography>
+            <Typography 
+              variant="body1" 
+              color="text.secondary" 
+              sx={{ textAlign: 'center', mb: 4, maxWidth: 600, mx: 'auto' }}
+            >
+              Outils avancés pour la configuration et la gestion des workflows administratifs
+            </Typography>
+            
+            <Grid container spacing={3}>
+              {adminFeatures.map((feature, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <Card 
+                    sx={{ 
+                      height: '100%',
+                      border: '2px solid transparent',
+                      transition: 'all 0.3s ease',
+                      '&:hover': {
+                        borderColor: '#1976d2',
+                        transform: 'translateY(-2px)',
+                        boxShadow: 4,
+                      }
+                    }}
+                  >
+                    <CardActionArea onClick={() => handleServiceClick(feature.path)}>
+                      <CardContent sx={{ p: 3, textAlign: 'center' }}>
+                        <Avatar sx={{ bgcolor: '#1976d2', mx: 'auto', mb: 2, width: 56, height: 56 }}>
+                          {feature.icon}
+                        </Avatar>
+                        <Typography variant="h6" component="h3" sx={{ fontWeight: 'bold', mb: 1 }}>
+                          {feature.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {feature.description}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        )}
 
         {/* Quick Stats */}
         <Box sx={{ 

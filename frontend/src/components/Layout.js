@@ -35,15 +35,19 @@ import { useAuth } from '../contexts/AuthContext';
 
 const drawerWidth = 240;
 
-const menuItems = [
-  { text: 'Tableau de bord', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/users' },
-  { text: 'Départements', icon: <BusinessIcon />, path: '/departments' },
-  { text: 'Bureaux', icon: <BusinessIcon />, path: '/bureaus' },
-  { text: 'Auto-Écoles', icon: <SchoolIcon />, path: '/auto-ecoles' },
-  { text: 'Candidats', icon: <PersonIcon />, path: '/candidats' },
-  { text: 'Permis', icon: <CreditCardIcon />, path: '/permis' },
-];
+const getMenuItems = (userRole) => {
+  const allMenuItems = [
+    { text: 'Tableau de bord', icon: <DashboardIcon />, path: '/dashboard', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT', 'CITOYEN'] },
+    { text: 'Utilisateurs', icon: <PeopleIcon />, path: '/users', roles: ['ADMIN', 'CHEF_SERVICE'] },
+    { text: 'Départements', icon: <BusinessIcon />, path: '/departments', roles: ['ADMIN', 'CHEF_SERVICE'] },
+    { text: 'Bureaux', icon: <BusinessIcon />, path: '/bureaus', roles: ['ADMIN', 'CHEF_SERVICE'] },
+    { text: 'Auto-Écoles', icon: <SchoolIcon />, path: '/auto-ecoles', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT'] },
+    { text: 'Candidats', icon: <PersonIcon />, path: '/candidats', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT'] },
+    { text: 'Permis', icon: <CreditCardIcon />, path: '/permis', roles: ['ADMIN', 'CHEF_SERVICE', 'AGENT'] },
+  ];
+  
+  return allMenuItems.filter(item => item.roles.includes(userRole));
+};
 
 function Layout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -105,7 +109,7 @@ function Layout({ children }) {
             <ListItemText primary="Accueil" />
           </ListItemButton>
         </ListItem>
-        {menuItems.map((item) => (
+        {getMenuItems(user?.role).map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
               selected={location.pathname === item.path}
