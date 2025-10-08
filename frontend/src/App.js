@@ -19,6 +19,8 @@ import RelatedServices from './pages/RelatedServices';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminWorkflows from './pages/AdminWorkflows';
 import AdminProcessSteps from './pages/AdminProcessSteps';
+import AdminRoles from './pages/AdminRoles';
+import AdminOrganization from './pages/AdminOrganization';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -63,8 +65,8 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/workflows" element={<AdminWorkflows />} />
         <Route path="/admin/workflows/:id/steps" element={<AdminProcessSteps />} />
-        <Route path="/admin/roles" element={<div>Admin Roles - Coming Soon</div>} />
-        <Route path="/admin/organization" element={<div>Admin Organization - Coming Soon</div>} />
+        <Route path="/admin/roles" element={<AdminRoles />} />
+        <Route path="/admin/organization" element={<AdminOrganization />} />
         <Route path="/admin/process" element={<div>Admin Process - Coming Soon</div>} />
         
         <Route path="/login" element={<Navigate to="/dashboard" />} />
