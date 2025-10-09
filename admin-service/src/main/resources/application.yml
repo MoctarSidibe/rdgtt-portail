@@ -29,6 +29,10 @@ spring:
         service-name: admin-service
         instance-id: admin-service-1
 
+jwt:
+  secret: rdgtt-secret-key-for-jwt-token-generation-2024
+  expiration: 86400000 # 24 hours in milliseconds
+
 management:
   endpoints:
     web:
